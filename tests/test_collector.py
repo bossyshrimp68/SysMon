@@ -7,7 +7,7 @@ NON_EXISTING_PATH = r"C:\Networks\work\python_practice\imagessssss\planes"
 partitions = get_partitions_stats()
 memory = get_memory_stats()
 disk = get_disk_stats(EXISTING_PATH)
-cpu_percent = get_cpu_percent()
+cpu_percent = get_cpu_percentage()
 
 print("Partitions:\n", partitions, end="\n\n")
 

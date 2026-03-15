@@ -5,6 +5,7 @@ from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 import time
+import collector
 
 from rich.text import Text
 
@@ -22,7 +23,7 @@ def create_layout():
     )
     layout["main"].split_row(
         Layout(name="left"),
-        Layout(name="right"),
+        Layout(name="cpu"),
     )
     layout["left"].split(Layout(name="memory"), Layout(name="partitions"))
     return layout
@@ -44,9 +45,11 @@ def cpu_panel():
     cpu_stats = Table(show_edge=False)
     cpu_stats.add_column("CPU core")
     cpu_stats.add_column("Usage")
-    cpu_stats.add_row("core1", "%")
-    cpu_stats.add_row("core2", "%")
-    cpu_stats.add_row("core3", "%")
+
+    cpu_percentage = collector.get_cpu_percentage()
+    for i, percent in enumerate(cpu_percentage):
+        cpu_stats.add_row(f"Core{i}", f"{percent}%")
+
     message_panel = Panel(
         Align.center(
             cpu_stats
@@ -93,10 +96,11 @@ def partitions_panel():
 
 layout = create_layout()
 layout["header"].update(header())
-layout["right"].update(cpu_panel())
+layout["cpu"].update(cpu_panel())
 layout["memory"].update(memory_panel())
 layout["partitions"].update(partitions_panel())
 
 with Live(layout, refresh_per_second=REFRESH_PER_SECOND) as live:
     while True:
+        layout["cpu"].update(cpu_panel())
         time.sleep(DELAY_SECONDS)
