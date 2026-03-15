@@ -1,10 +1,11 @@
 from rich.live import Live
-
 from rich.table import Table
-
 import time
 
-with Live(refresh_per_second=1) as live:
+DELAY_SECONDS = 2
+REFRESH_PER_SECOND = 1
+
+with Live(refresh_per_second=REFRESH_PER_SECOND) as live:
 
     while True:
 
@@ -18,4 +19,4 @@ with Live(refresh_per_second=1) as live:
 
         live.update(table)
 
-        time.sleep(2)
+        time.sleep(DELAY_SECONDS)
