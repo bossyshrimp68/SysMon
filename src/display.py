@@ -39,6 +39,7 @@ def header():
     )
     return message_panel
 
+
 def footer():
     footer_message = "Press Ctrl + C to exit:)"
     message_panel = Panel(
@@ -120,9 +121,11 @@ layout["cpu"].update(cpu_panel())
 layout["memory"].update(memory_panel())
 layout["partitions"].update(partitions_panel())
 
-with Live(layout, refresh_per_second=REFRESH_PER_SECOND) as live:
-    while True:
-        layout["cpu"].update(cpu_panel())
-        layout["memory"].update(memory_panel())
-        layout["partitions"].update(partitions_panel())
-        time.sleep(DELAY_SECONDS)
+
+def display():
+    with Live(layout, refresh_per_second=REFRESH_PER_SECOND) as live:
+        while True:
+            layout["cpu"].update(cpu_panel())
+            layout["memory"].update(memory_panel())
+            layout["partitions"].update(partitions_panel())
+            time.sleep(DELAY_SECONDS)

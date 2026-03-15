@@ -3,7 +3,9 @@ import os.path
 import psutil
 from psutil._common import bytes2human
 
-SECONDS_BETWEEN_CALLS = 0.1  # so it doesn't measure in 0.0
+import main
+
+SECONDS_BETWEEN_CALLS = main.get_interval()  # default is 2 seconds
 MEMORY_STATS_END_INDEX = 4
 
 
