@@ -1,13 +1,13 @@
+import threading
+
 from rich.align import Align
-from rich.console import Group
 from rich.layout import Layout
 from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 import time
 import collector
-
-from rich.text import Text
+from multiprocessing import Process
 
 DELAY_SECONDS = 2
 REFRESH_PER_SECOND = 1
@@ -117,15 +117,22 @@ def partitions_panel():
 layout = create_layout()
 layout["header"].update(header())
 layout["footer"].update(footer())
-layout["cpu"].update(cpu_panel())
+# layout["cpu"].update(cpu_panel())
 layout["memory"].update(memory_panel())
 layout["partitions"].update(partitions_panel())
 
 
 def display():
     with Live(layout, refresh_per_second=REFRESH_PER_SECOND) as live:
+        cpu_thread = threading.Thread(target=cpu_panel)
+        cpu_thread.start()
+
         while True:
-            layout["cpu"].update(cpu_panel())
+            if not cpu_thread.is_alive():
+                cpu_thread = threading.Thread(target=cpu_panel)
+                layout["cpu"].update(cpu_panel())
+                cpu_thread.start()
+
             layout["memory"].update(memory_panel())
             layout["partitions"].update(partitions_panel())
             time.sleep(DELAY_SECONDS)
