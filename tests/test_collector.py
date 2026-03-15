@@ -15,7 +15,7 @@ print("Memory:\n", memory, end="\n\n")
 
 print("Disk:\n", disk, end="\n\n")
 
-print("CPU percentage:\n", cpu_percent, end="\n\n")
+print("CPU percentage per CPU:\n", cpu_percent, end="\n\n")
 
 try:
     disk = get_disk_stats(NON_EXISTING_PATH)
