@@ -39,20 +39,28 @@ def header():
     )
     return message_panel
 
+def footer():
+    footer_message = "Press Ctrl + C to exit:)"
+    message_panel = Panel(
+        footer_message,
+        border_style="bright_blue",
+    )
+    return message_panel
+
 
 def cpu_panel():
     """Some example content."""
-    cpu_stats = Table(show_edge=False)
-    cpu_stats.add_column("CPU core")
-    cpu_stats.add_column("Usage")
+    cpu_table = Table(show_edge=False)
+    cpu_table.add_column("CPU core")
+    cpu_table.add_column("Usage")
 
     cpu_percentage = collector.get_cpu_percentage()
     for i, percent in enumerate(cpu_percentage):
-        cpu_stats.add_row(f"Core{i}", f"{percent}%")
+        cpu_table.add_row(f"Core{i}", f"{percent}%")
 
     message_panel = Panel(
         Align.center(
-            cpu_stats
+            cpu_table
         ),
         title="CPU",
         border_style="bright_blue",
@@ -61,13 +69,16 @@ def cpu_panel():
 
 
 def memory_panel():
-    ram_stats = Table(show_edge=False, show_header=False)
-    ram_stats.add_row("Total memory", "1")
-    ram_stats.add_row("Used memory", "1")
-    ram_stats.add_row("Used percentage", "%")
+    ram_table = Table(show_edge=False, show_header=False)
+
+    memory_stats = collector.get_memory_stats()
+    ram_table.add_row("Total memory", memory_stats["total"])
+    ram_table.add_row("Used memory", memory_stats["used"])
+    ram_table.add_row("Available memory", memory_stats["available"])
+    ram_table.add_row("Used percentage", f"{memory_stats['percent']}%")
     message_panel = Panel(
         Align.center(
-            ram_stats
+            ram_table
         ),
         title="RAM",
         border_style="bright_blue",
@@ -76,17 +87,25 @@ def memory_panel():
 
 
 def partitions_panel():
-    partitions_stats = Table(show_edge=False)
-    partitions_stats.add_column("Path")
-    partitions_stats.add_column("Total memory")
-    partitions_stats.add_column("Used memory")
-    partitions_stats.add_column("Available memory")
-    partitions_stats.add_column("Used percentage")
-    partitions_stats.add_row("/", "1", "1", "1", "%")
-    partitions_stats.add_row("/", "1", "1", "1", "%")
+    partitions_table = Table(show_edge=False)
+    partitions_table.add_column("Path")
+    partitions_table.add_column("Total memory")
+    partitions_table.add_column("Used memory")
+    partitions_table.add_column("Available memory")
+    partitions_table.add_column("Used percentage")
+
+    partitions_stats = collector.get_partitions_stats()
+    for partition, stats in partitions_stats.items():
+        partitions_table.add_row(
+            partition,
+            stats["total"],
+            stats["used"],
+            stats["available"],
+            f"{stats['percent']}%")
+
     message_panel = Panel(
         Align.center(
-            partitions_stats
+            partitions_table
         ),
         title="Partitions",
         border_style="bright_blue",
@@ -96,6 +115,7 @@ def partitions_panel():
 
 layout = create_layout()
 layout["header"].update(header())
+layout["footer"].update(footer())
 layout["cpu"].update(cpu_panel())
 layout["memory"].update(memory_panel())
 layout["partitions"].update(partitions_panel())
@@ -103,4 +123,6 @@ layout["partitions"].update(partitions_panel())
 with Live(layout, refresh_per_second=REFRESH_PER_SECOND) as live:
     while True:
         layout["cpu"].update(cpu_panel())
+        layout["memory"].update(memory_panel())
+        layout["partitions"].update(partitions_panel())
         time.sleep(DELAY_SECONDS)
