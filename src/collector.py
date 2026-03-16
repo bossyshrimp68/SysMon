@@ -48,7 +48,8 @@ def get_partitions_stats():
 
 
 def get_cpu_percentage():
-    cores = psutil.cpu_percent(interval=SECONDS_BETWEEN_CALLS, percpu=True)  # reruns cpu percentage since last call per core
+    cores = psutil.cpu_percent(interval=SECONDS_BETWEEN_CALLS,
+                               percpu=True)  # reruns cpu percentage since last call per core
     return sorted(cores, reverse=True)
 
 

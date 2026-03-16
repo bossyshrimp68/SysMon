@@ -14,7 +14,6 @@ REFRESH_PER_SECOND = 1
 
 def create_layout():
     layout = Layout(name="sysmon")
-
     layout.split(
         Layout(name="header", size=3),
         Layout(name="main", ratio=1),
@@ -58,6 +57,7 @@ def update_cpu(cpu_data):
 
 def cpu_panel(cpu_data):
     cpu_table = Table(show_edge=False)
+
     cpu_table.add_column("CPU core")
     cpu_table.add_column("Usage")
 
@@ -95,6 +95,7 @@ def ram_panel(ram_data):
     ram_table.add_row("Used memory", used)
     ram_table.add_row("Available memory", available)
     ram_table.add_row("Used percentage", percent)
+
     ram_panel = Panel(
         Align.center(
             ram_table
@@ -121,6 +122,7 @@ def update_partitions(partitions_data):
 
 def partitions_panel(partition_data):
     partitions_table = Table(show_edge=False)
+
     partitions_table.add_column("Path")
     partitions_table.add_column("Total memory")
     partitions_table.add_column("Used memory")
@@ -141,15 +143,15 @@ def partitions_panel(partition_data):
     return partition_panel
 
 
-def initiate_threads(cpu_data, am_data, partition_data):
+def initiate_threads(cpu_data, ram_data, partition_data):
     cpu_thread = threading.Thread(target=update_cpu, args=(cpu_data,), daemon=True)
     cpu_thread.start()
 
-    partition_thread = threading.Thread(target=update_partitions, args=(partition_data,), daemon=True)
-    partition_thread.start()
-
     ram_thread = threading.Thread(target=update_ram, args=(ram_data,), daemon=True)
     ram_thread.start()
+
+    partition_thread = threading.Thread(target=update_partitions, args=(partition_data,), daemon=True)
+    partition_thread.start()
 
 
 cpu_data = []
