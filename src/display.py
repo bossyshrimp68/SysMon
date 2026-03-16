@@ -6,11 +6,7 @@ from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 import time
-
-from rich.text import Text
-
 import collector
-from multiprocessing import Process
 
 DELAY_SECONDS = 2
 REFRESH_PER_SECOND = 1
@@ -28,91 +24,102 @@ def create_layout():
         Layout(name="left"),
         Layout(name="cpu"),
     )
-    layout["cpu"].split(
-        Layout(name="cpu columns"),
-        Layout(name="cpu data", ratio=3)
-    )
-    layout["left"].split(
-        Layout(name="memory"),
-        Layout(name="partitions")
-    )
+    layout["left"].split(Layout(name="ram"), Layout(name="partitions"))
     return layout
 
 
 def header():
     header_message = "System Monitoring CLI Tool"
-    message_panel = Panel(
+    header_panel = Panel(
         Align.center(
             header_message
         ),
         border_style="bright_blue",
     )
-    return message_panel
+    return header_panel
 
 
 def footer():
     footer_message = "Press Ctrl + C to exit:)"
-    message_panel = Panel(
+    footer_panel = Panel(
         footer_message,
         border_style="bright_blue",
     )
-    return message_panel
+    return footer_panel
 
 
-def cpu_panel():
-    # left_column = "CPU core"
-    # right_column = "usage"
-    # columns = Text()
+def update_cpu(cpu_data):
+    while True:
+        cpu_stats = collector.get_cpu_percentage()
+        cpu_data.clear()
+        for i, percent in enumerate(cpu_stats):
+            cpu_data.append((f"Core{i}", f"{percent}%"))
 
-    grid = Table.grid(expand=True)
-    grid.add_column("CPU core", justify="left")
-    grid.add_column("Usage", justify="right")
 
-    column_panel = Panel(
-        grid,
+def cpu_panel(cpu_data):
+    cpu_table = Table(show_edge=False)
+    cpu_table.add_column("CPU core")
+    cpu_table.add_column("Usage")
+
+    for data in cpu_data:
+        core, usage = data
+        cpu_table.add_row(core, usage)
+
+    cpu_panel = Panel(
+        Align.center(
+            cpu_table
+        ),
         title="CPU",
         border_style="bright_blue",
     )
-
-    return column_panel
-    #
-    # cpu_table = Table(show_edge=False, expand=True)
-    # cpu_table.add_column("CPU core", justify="left")
-    # cpu_table.add_column("Usage", justify="right")
-    #
-    # cpu_percentage = collector.get_cpu_percentage()
-    # for i, percent in enumerate(cpu_percentage):
-    #     cpu_table.add_row(f"Core{i}", f"{percent}%")
-    #
-    # message_panel = Panel(
-    #     Align.center(
-    #         cpu_table
-    #     ),
-    #     title="CPU",
-    #     border_style="bright_blue",
-    # )
-    # return message_panel
+    return cpu_panel
 
 
-def memory_panel():
+def update_ram(ram_data):
+    while True:
+        ram_stats = collector.get_ram_stats()
+        ram_data.clear()
+        ram_data.append(
+            (ram_stats["total"],
+             ram_stats["used"],
+             ram_stats["available"],
+             f"{ram_stats['percent']}%")
+        )
+
+
+def ram_panel(ram_data):
     ram_table = Table(show_edge=False, show_header=False)
 
-    memory_stats = collector.get_memory_stats()
-    ram_table.add_row("Total memory", memory_stats["total"])
-    ram_table.add_row("Used memory", memory_stats["used"])
-    ram_table.add_row("Available memory", memory_stats["available"])
-    ram_table.add_row("Used percentage", f"{memory_stats['percent']}%")
-    message_panel = Panel(
+    total, used, available, percent = ram_data[0]
+    ram_table.add_row("Total memory", total)
+    ram_table.add_row("Used memory", used)
+    ram_table.add_row("Available memory", available)
+    ram_table.add_row("Used percentage", percent)
+    ram_panel = Panel(
         Align.center(
             ram_table
         ),
         title="RAM",
         border_style="bright_blue",
     )
-    return message_panel
+    return ram_panel
 
 
-def partitions_panel():
+def update_partitions(partitions_data):
+    while True:
+        partitions_stats = collector.get_partitions_stats()
+        partitions_data.clear()
+        for partition, stats in partitions_stats.items():
+            partitions_data.append(
+                (partition,
+                 stats["total"],
+                 stats["used"],
+                 stats["available"],
+                 f"{stats['percent']}%")
+            )
+
+
+def partitions_panel(partition_data):
     partitions_table = Table(show_edge=False)
     partitions_table.add_column("Path")
     partitions_table.add_column("Total memory")
@@ -120,47 +127,49 @@ def partitions_panel():
     partitions_table.add_column("Available memory")
     partitions_table.add_column("Used percentage")
 
-    partitions_stats = collector.get_partitions_stats()
-    for partition, stats in partitions_stats.items():
-        partitions_table.add_row(
-            partition,
-            stats["total"],
-            stats["used"],
-            stats["available"],
-            f"{stats['percent']}%")
+    for data in partition_data:
+        partition, total, used, available, percent = data
+        partitions_table.add_row(partition, total, used, available, percent)
 
-    message_panel = Panel(
+    partition_panel = Panel(
         Align.center(
             partitions_table
         ),
         title="Partitions",
         border_style="bright_blue",
     )
-    return message_panel
+    return partition_panel
 
+
+def initiate_threads(cpu_data, am_data, partition_data):
+    cpu_thread = threading.Thread(target=update_cpu, args=(cpu_data,), daemon=True)
+    cpu_thread.start()
+
+    partition_thread = threading.Thread(target=update_partitions, args=(partition_data,), daemon=True)
+    partition_thread.start()
+
+    ram_thread = threading.Thread(target=update_ram, args=(ram_data,), daemon=True)
+    ram_thread.start()
+
+
+cpu_data = []
+ram_data = []
+partition_data = []
+
+initiate_threads(cpu_data, ram_data, partition_data)
 
 layout = create_layout()
 layout["header"].update(header())
 layout["footer"].update(footer())
-# layout["cpu"].update(cpu_panel())
-layout["memory"].update(memory_panel())
-layout["partitions"].update(partitions_panel())
-layout["cpu"].update(Panel(cpu_panel(), title="CPU", border_style="bright_blue"))
-layout["cpu columns"].update(cpu_panel())
-
+layout["cpu"].update(cpu_panel(cpu_data))
+layout["ram"].update(ram_panel(ram_data))
+layout["partitions"].update(partitions_panel(partition_data))
 
 
 def display():
-    with Live(layout, refresh_per_second=REFRESH_PER_SECOND) as live:
-        cpu_thread = threading.Thread(target=cpu_panel)
-        cpu_thread.start()
-
+    with Live(layout, refresh_per_second=REFRESH_PER_SECOND):
         while True:
-            # if not cpu_thread.is_alive():
-            #     cpu_thread = threading.Thread(target=cpu_panel)
-            #     layout["cpu"].update(cpu_panel())
-            #     cpu_thread.start()
-
-            layout["memory"].update(memory_panel())
-            layout["partitions"].update(partitions_panel())
+            layout["cpu"].update(cpu_panel(cpu_data))
+            layout["ram"].update(ram_panel(ram_data))
+            layout["partitions"].update(partitions_panel(partition_data))
             time.sleep(DELAY_SECONDS)
