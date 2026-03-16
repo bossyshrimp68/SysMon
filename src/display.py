@@ -6,6 +6,9 @@ from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 import time
+
+from rich.text import Text
+
 import collector
 from multiprocessing import Process
 
@@ -25,7 +28,14 @@ def create_layout():
         Layout(name="left"),
         Layout(name="cpu"),
     )
-    layout["left"].split(Layout(name="memory"), Layout(name="partitions"))
+    layout["cpu"].split(
+        Layout(name="cpu columns"),
+        Layout(name="cpu data", ratio=3)
+    )
+    layout["left"].split(
+        Layout(name="memory"),
+        Layout(name="partitions")
+    )
     return layout
 
 
@@ -50,23 +60,38 @@ def footer():
 
 
 def cpu_panel():
-    """Some example content."""
-    cpu_table = Table(show_edge=False)
-    cpu_table.add_column("CPU core")
-    cpu_table.add_column("Usage")
+    # left_column = "CPU core"
+    # right_column = "usage"
+    # columns = Text()
 
-    cpu_percentage = collector.get_cpu_percentage()
-    for i, percent in enumerate(cpu_percentage):
-        cpu_table.add_row(f"Core{i}", f"{percent}%")
+    grid = Table.grid(expand=True)
+    grid.add_column("CPU core", justify="left")
+    grid.add_column("Usage", justify="right")
 
-    message_panel = Panel(
-        Align.center(
-            cpu_table
-        ),
+    column_panel = Panel(
+        grid,
         title="CPU",
         border_style="bright_blue",
     )
-    return message_panel
+
+    return column_panel
+    #
+    # cpu_table = Table(show_edge=False, expand=True)
+    # cpu_table.add_column("CPU core", justify="left")
+    # cpu_table.add_column("Usage", justify="right")
+    #
+    # cpu_percentage = collector.get_cpu_percentage()
+    # for i, percent in enumerate(cpu_percentage):
+    #     cpu_table.add_row(f"Core{i}", f"{percent}%")
+    #
+    # message_panel = Panel(
+    #     Align.center(
+    #         cpu_table
+    #     ),
+    #     title="CPU",
+    #     border_style="bright_blue",
+    # )
+    # return message_panel
 
 
 def memory_panel():
@@ -120,6 +145,9 @@ layout["footer"].update(footer())
 # layout["cpu"].update(cpu_panel())
 layout["memory"].update(memory_panel())
 layout["partitions"].update(partitions_panel())
+layout["cpu"].update(Panel(cpu_panel(), title="CPU", border_style="bright_blue"))
+layout["cpu columns"].update(cpu_panel())
+
 
 
 def display():
@@ -128,10 +156,10 @@ def display():
         cpu_thread.start()
 
         while True:
-            if not cpu_thread.is_alive():
-                cpu_thread = threading.Thread(target=cpu_panel)
-                layout["cpu"].update(cpu_panel())
-                cpu_thread.start()
+            # if not cpu_thread.is_alive():
+            #     cpu_thread = threading.Thread(target=cpu_panel)
+            #     layout["cpu"].update(cpu_panel())
+            #     cpu_thread.start()
 
             layout["memory"].update(memory_panel())
             layout["partitions"].update(partitions_panel())
