@@ -11,7 +11,7 @@ ROUND_UP_TO = 2
 
 
 def get_cpu_percentage():
-    """ reruns cpu percentage for each core every interval, average percent in index 0 """
+    """ returns average cpu usage, and usage percentage for each core every interval """
     cores = psutil.cpu_percent(interval=SECONDS_BETWEEN_CALLS, percpu=True)
     total = 0
     for percent in cores:
