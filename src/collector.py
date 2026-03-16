@@ -9,7 +9,7 @@ SECONDS_BETWEEN_CALLS = main.get_interval()  # default is 2 seconds
 MEMORY_STATS_END_INDEX = 4
 
 
-def get_memory_stats():
+def get_ram_stats():
     memory_stats = psutil.virtual_memory()
     formatted_stats = convert_to_human_format(memory_stats[:MEMORY_STATS_END_INDEX])
     total, available, percent, used = formatted_stats
