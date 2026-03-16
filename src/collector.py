@@ -1,4 +1,5 @@
 import os.path
+import threading
 
 import psutil
 from psutil._common import bytes2human
@@ -10,39 +11,36 @@ MEMORY_STATS_END_INDEX = 4
 ROUND_UP_TO = 2
 
 
-def get_cpu_percentage():
-    """ returns average cpu usage, and usage percentage for each core every interval """
+def get_cpu_percentage(cpu_data):
+    """ updates average cpu usage, and usage percentage for each core every interval """
     cores = psutil.cpu_percent(interval=SECONDS_BETWEEN_CALLS, percpu=True)
     total = 0
     for percent in cores:
         total += percent
     average_usage = (total / len(cores)).__round__(ROUND_UP_TO)
     cores.sort(reverse=True)
-    return average_usage, cores
+    cpu_data["average"] = average_usage
+    cpu_data["cores"] = cores
 
 
-def get_ram_stats():
-    """ returns ram status in a dict """
+def get_ram_stats(ram_data):
+    """ updates ram status in a dict """
     memory_stats = psutil.virtual_memory()
     formatted_stats = convert_to_human_format(memory_stats[:MEMORY_STATS_END_INDEX])
     total, available, percent, used = formatted_stats
 
-    return {
-        "total": total,
-        "used": used,
-        "available": available,
-        "percent": percent,
-    }
+    ram_data["total"] = total
+    ram_data["available"] = available
+    ram_data["percent"] = percent
+    ram_data["used"] = used
 
 
-def get_partitions_stats():
-    """ returns partition path and stats for every partition """
+def get_partitions_stats(partitions_data):
+    """ updates partition path and stats for every partition """
     partitions_stats = psutil.disk_partitions(all=True)  # if all=False returns physical devices only
-    partitions = {}
     for partition in partitions_stats:
         path = partition.mountpoint
-        partitions[path] = get_disk_stats(path)
-    return partitions
+        partitions_data[path] = get_disk_stats(path)
 
 
 def get_disk_stats(path):
@@ -70,3 +68,56 @@ def convert_to_human_format(stats):
             stat = bytes2human(stat)
         formatted_stats.append(stat)
     return tuple(formatted_stats)
+
+
+cpu_data = {
+    "average": 0,
+    "cores": []
+}
+
+ram_data = {
+    "total": 0,
+    "used": 0,
+    "available": 0,
+    "percent": 0
+}
+
+partitions_data = {}
+
+
+def cpu_thread_function():
+    while True:
+        get_cpu_percentage(cpu_data)
+
+
+def ram_thread_function():
+    while True:
+        get_ram_stats(ram_data)
+
+
+def partitions_thread_function():
+    while True:
+        get_partitions_stats(partitions_data)
+
+
+def initiate_threads():
+    cpu_thread = threading.Thread(target=cpu_thread_function, daemon=True)
+    cpu_thread.start()
+
+    ram_thread = threading.Thread(target=ram_thread_function, daemon=True)
+    ram_thread.start()
+
+    partition_thread = threading.Thread(target=partitions_thread_function, daemon=True)
+    partition_thread.start()
+
+
+def get_cpu_data():
+    return cpu_data.copy()
+
+
+def get_ram_data():
+    return ram_data.copy()
+
+
+def get_partitions_data():
+    return partitions_data.copy()
