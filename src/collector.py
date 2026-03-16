@@ -3,11 +3,13 @@ import os.path
 import psutil
 from psutil._common import bytes2human
 
-SECONDS_BETWEEN_CALLS = 0.1  # so it doesn't measure in 0.0
+import main
+
+SECONDS_BETWEEN_CALLS = main.get_interval()  # default is 2 seconds
 MEMORY_STATS_END_INDEX = 4
 
 
-def get_memory_stats():
+def get_ram_stats():
     memory_stats = psutil.virtual_memory()
     formatted_stats = convert_to_human_format(memory_stats[:MEMORY_STATS_END_INDEX])
     total, available, percent, used = formatted_stats
@@ -46,7 +48,8 @@ def get_partitions_stats():
 
 
 def get_cpu_percentage():
-    cores = psutil.cpu_percent(interval=SECONDS_BETWEEN_CALLS, percpu=True)  # reruns cpu percentage since last call per core
+    cores = psutil.cpu_percent(interval=SECONDS_BETWEEN_CALLS,
+                               percpu=True)  # reruns cpu percentage since last call per core
     return sorted(cores, reverse=True)
 
 
