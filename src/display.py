@@ -49,8 +49,9 @@ def footer():
 
 def update_cpu(cpu_data):
     while True:
-        cpu_stats = collector.get_cpu_percentage()
+        average_cpu, cpu_stats = collector.get_cpu_percentage()
         cpu_data.clear()
+        cpu_data.append(("Average CPU usage", f"{average_cpu}%"))
         for i, percent in enumerate(cpu_stats):
             cpu_data.append((f"Core{i}", f"{percent}%"))
 
