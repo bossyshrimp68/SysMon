@@ -10,6 +10,20 @@ SECONDS_BETWEEN_CALLS = main.get_interval()  # default is 2 seconds
 MEMORY_STATS_END_INDEX = 4
 ROUND_UP_TO = 2
 
+cpu_data = {
+    "average": 0,
+    "cores": []
+}
+
+ram_data = {
+    "total": 0,
+    "used": 0,
+    "available": 0,
+    "percent": 0
+}
+
+partitions_data = {}
+
 
 def get_cpu_percentage(cpu_data):
     """ updates average cpu usage, and usage percentage for each core every interval """
@@ -70,19 +84,15 @@ def convert_to_human_format(stats):
     return tuple(formatted_stats)
 
 
-cpu_data = {
-    "average": 0,
-    "cores": []
-}
+def initiate_threads():
+    cpu_thread = threading.Thread(target=cpu_thread_function, daemon=True)
+    cpu_thread.start()
 
-ram_data = {
-    "total": 0,
-    "used": 0,
-    "available": 0,
-    "percent": 0
-}
+    ram_thread = threading.Thread(target=ram_thread_function, daemon=True)
+    ram_thread.start()
 
-partitions_data = {}
+    partition_thread = threading.Thread(target=partitions_thread_function, daemon=True)
+    partition_thread.start()
 
 
 def cpu_thread_function():
@@ -98,17 +108,6 @@ def ram_thread_function():
 def partitions_thread_function():
     while True:
         get_partitions_stats(partitions_data)
-
-
-def initiate_threads():
-    cpu_thread = threading.Thread(target=cpu_thread_function, daemon=True)
-    cpu_thread.start()
-
-    ram_thread = threading.Thread(target=ram_thread_function, daemon=True)
-    ram_thread.start()
-
-    partition_thread = threading.Thread(target=partitions_thread_function, daemon=True)
-    partition_thread.start()
 
 
 def get_cpu_data():
