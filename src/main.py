@@ -2,6 +2,7 @@ import argparse
 import os.path
 
 import display
+import collector
 
 DEFAULT_INTERVAL_VALUE = 2
 
@@ -30,10 +31,14 @@ args = parser.parse_args()
 
 
 def main():
+    collector.initiate_threads()
+
     try:
         display.display()
     except KeyboardInterrupt:
         print("Closing...")
+
+    # logger.log(data)
 
 
 if __name__ == "__main__":
