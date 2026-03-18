@@ -1,10 +1,19 @@
 import argparse
 import os.path
+import time
 
 import display
 import collector
+import logger
 
 DEFAULT_INTERVAL_VALUE = 2
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--interval", help="set the polling frequency (default: 2 seconds)", type=int)
+parser.add_argument("--log", help="log file path", type=str)
+args = parser.parse_args()
+
+start_time = time.time()
 
 
 def get_interval():
@@ -22,23 +31,20 @@ def get_log_path():
             return log_path
         else:
             raise FileNotFoundError(f"The given file '{log_path}' does not exist!")
-
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--interval", help="set the polling frequency (default: 2 seconds)", type=int)
-parser.add_argument("--log", help="log file path", type=str)
-args = parser.parse_args()
+    return None
 
 
 def main():
     collector.initiate_threads()
 
+    log_path = get_log_path()
+    if log_path:
+        logger.initiate_logging(log_path)
+
     try:
         display.display()
     except KeyboardInterrupt:
         print("Closing...")
-
-    # logger.log(data)
 
 
 if __name__ == "__main__":
