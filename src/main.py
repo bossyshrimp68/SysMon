@@ -33,7 +33,7 @@ def get_log_path():
 
 
 def main():
-    collector.initiate_threads()
+    collector.initiate_threads(get_interval())
 
     log_path = get_log_path()
     if log_path:

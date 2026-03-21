@@ -104,7 +104,7 @@ def partitions_panel():
             str(data["total"]),
             str(data["used"]),
             str(data["available"]),
-            str(data["percent"])
+            f"{data['percent']}%"
         )
 
     partition_panel = Panel(

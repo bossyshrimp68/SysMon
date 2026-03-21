@@ -1,48 +1,44 @@
 import os.path
 import threading
-from heapq import merge
 
 import psutil
 from psutil._common import bytes2human
 
-import main
-
-SECONDS_BETWEEN_CALLS = main.get_interval()  # default is 2 seconds
 MEMORY_STATS_END_INDEX = 4
 ROUND_UP_TO = 2
 
+cpu_update_interval = 0
+
 cpu_data = {
-    "average": 0,
+    "average": 0.0,
     "cores": []
 }
 
 ram_data = {
-    "total": 0,
-    "used": 0,
-    "available": 0,
-    "percent": 0
+    "total": '',
+    "used": '',
+    "available": '',
+    "percent": ''
 }
 
 partitions_data = {}
 
 
-def get_cpu_percentage(cpu_data):
+def update_cpu_percentage():
     """ updates average cpu usage, and usage percentage for each core every interval """
-    cores = psutil.cpu_percent(interval=SECONDS_BETWEEN_CALLS, percpu=True)
-    total = 0
-    for percent in cores:
-        total += percent
+    cores = psutil.cpu_percent(interval=cpu_update_interval, percpu=True)
+    total = sum(cores)
     average_usage = (total / len(cores)).__round__(ROUND_UP_TO)
     cores.sort(reverse=True)
     cpu_data["average"] = average_usage
     cpu_data["cores"] = cores
 
 
-def get_ram_stats(ram_data):
+def update_ram_stats():
     """ updates ram status in a dict """
-    memory_stats = psutil.virtual_memory()
-    formatted_stats = convert_to_human_format(memory_stats[:MEMORY_STATS_END_INDEX])
-    total, available, percent, used = formatted_stats
+    memory_stats = psutil.virtual_memory()[:MEMORY_STATS_END_INDEX]
+    total, available, percent, used = memory_stats
+    total, available, used = convert_to_human_format([total, available, used])
 
     ram_data["total"] = total
     ram_data["available"] = available
@@ -50,7 +46,7 @@ def get_ram_stats(ram_data):
     ram_data["used"] = used
 
 
-def get_partitions_stats(partitions_data):
+def update_partitions_stats():
     """ updates partition path and stats for every partition """
     partitions_stats = psutil.disk_partitions(all=True)  # if all=False returns physical devices only
     for partition in partitions_stats:
@@ -59,33 +55,31 @@ def get_partitions_stats(partitions_data):
 
 
 def get_disk_stats(path):
-    """ given a partition, returns its total, used, free memory, and used memory percentage """
+    """ given a partition, returns its total, used, available memory, and used memory percentage """
     if not os.path.exists(path):
         raise FileNotFoundError(f"The file '{path}' does not exist!")
 
     disk_stats = psutil.disk_usage(path)  # disk usage statistics for the given path
-    formatted_stats = convert_to_human_format(disk_stats)
-    total, used, free, percent = formatted_stats
+    total, used, available, percent = disk_stats
+    total, used, available = convert_to_human_format([total, used, available])
 
     return {
         "total": total,
         "used": used,
-        "available": free,
+        "available": available,
         "percent": percent
     }
 
 
 def convert_to_human_format(stats):
-    """ bytes are written as int and percentage as floats. returns a new tuple with the bytes in human format """
-    formatted_stats = []
-    for stat in stats:
-        if type(stat) is int:
-            stat = bytes2human(stat)
-        formatted_stats.append(stat)
+    formatted_stats = [bytes2human(stat) for stat in stats]
     return tuple(formatted_stats)
 
 
-def initiate_threads():
+def initiate_threads(interval):
+    global cpu_update_interval
+    cpu_update_interval = interval
+
     cpu_thread = threading.Thread(target=cpu_thread_function, daemon=True)
     cpu_thread.start()
 
@@ -98,17 +92,17 @@ def initiate_threads():
 
 def cpu_thread_function():
     while True:
-        get_cpu_percentage(cpu_data)
+        update_cpu_percentage()
 
 
 def ram_thread_function():
     while True:
-        get_ram_stats(ram_data)
+        update_ram_stats()
 
 
 def partitions_thread_function():
     while True:
-        get_partitions_stats(partitions_data)
+        update_partitions_stats()
 
 
 def get_cpu_data():
@@ -127,7 +121,8 @@ def get_all_data():
     """ returns all data as a dict, without cores with 0 usage """
     cpu_stats = get_cpu_data()
     cores_list = cpu_stats["cores"].copy()
-    cpu_stats["cores"] = [x for x in cores_list if x != 0.0]
+    no_zeros = [x for x in cores_list if x != 0.0]
+    cpu_stats["cores"] = sorted(no_zeros, reverse=True)
 
     return {
         "cpu": cpu_stats,
