@@ -120,6 +120,7 @@ def partitions_panel():
 layout = create_layout()
 layout["header"].update(header())
 layout["footer"].update(footer())
+layout["cpu"].update(cpu_panel())
 layout["ram"].update(ram_panel())
 layout["partitions"].update(partitions_panel())
 

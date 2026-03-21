@@ -1,5 +1,6 @@
 import os.path
 import threading
+from heapq import merge
 
 import psutil
 from psutil._common import bytes2human
@@ -120,3 +121,16 @@ def get_ram_data():
 
 def get_partitions_data():
     return partitions_data.copy()
+
+
+def get_all_data():
+    """ returns all data as a dict, without cores with 0 usage """
+    cpu_stats = get_cpu_data()
+    cores_list = cpu_stats["cores"].copy()
+    cpu_stats["cores"] = [x for x in cores_list if x != 0.0]
+
+    return {
+        "cpu": cpu_stats,
+        "ram": get_ram_data(),
+        "partitions": get_partitions_data()
+    }
