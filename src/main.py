@@ -13,8 +13,6 @@ parser.add_argument("--interval", help="set the polling frequency (default: 2 se
 parser.add_argument("--log", help="log file path", type=str)
 args = parser.parse_args()
 
-start_time = time.time()
-
 
 def get_interval():
     interval = args.interval

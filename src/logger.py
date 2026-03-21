@@ -25,7 +25,7 @@ def log():
     global start_time
     while True:
         current_time = time.time()
-        if current_time - start_time >= LOG_INTERVALS_SECONDS:
+        if (current_time - start_time) >= LOG_INTERVALS_SECONDS:
             log_as_json(collector.get_all_data())
             start_time = current_time
 

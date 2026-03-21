@@ -124,6 +124,7 @@ def get_partitions_data():
 
 
 def get_all_data():
+    """ returns all data as a dict, without cores with 0 usage """
     cpu_stats = get_cpu_data()
     cores_list = cpu_stats["cores"].copy()
     cpu_stats["cores"] = [x for x in cores_list if x != 0.0]
