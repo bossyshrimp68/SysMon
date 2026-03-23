@@ -32,7 +32,7 @@ def test_update_partitions_data(mocker):
     mock_partition = mocker.Mock()
     mock_partition.mountpoint = "D:\\"
     mocker.patch("collector.psutil.disk_partitions", return_value=[mock_partition])
-    mocker.patch.object(collector, "get_disk_stats", return_value={  # because it is an internal function
+    mocker.patch.object(collector, "get_disk_stats", return_value={  # .Object because it is an internal function
         "total": "700.0B",
         "used": "1000.0B",
         "available": "800.0B",

@@ -4,6 +4,8 @@ import threading
 import psutil
 from psutil._common import bytes2human
 
+import logger
+
 MEMORY_STATS_END_INDEX = 4
 ROUND_UP_TO = 2
 
@@ -51,15 +53,25 @@ def update_partitions_stats():
     partitions_stats = psutil.disk_partitions(all=True)  # if all=False returns physical devices only
     for partition in partitions_stats:
         path = partition.mountpoint
-        partitions_data[path] = get_disk_stats(path)
+        disk_stats = get_disk_stats(path)
+        if not disk_stats:
+            partitions_data.pop(path, None)  # returns None if path isn't in the data
+        else:
+            partitions_data[path] = get_disk_stats(path)
 
 
 def get_disk_stats(path):
     """ given a partition, returns its total, used, available memory, and used memory percentage """
     if not os.path.exists(path):
-        raise FileNotFoundError(f"The file '{path}' does not exist!")
+        logger.log_error("Path doesn't exist", path)
+        return None
 
-    disk_stats = psutil.disk_usage(path)  # disk usage statistics for the given path
+    try:
+        disk_stats = psutil.disk_usage(path)  # disk usage statistics for the given path
+    except OSError:
+        logger.log_error("Partition disconnected", path)
+        return None
+
     total, used, available, percent = disk_stats
     total, used, available = convert_to_human_format([total, used, available])
 

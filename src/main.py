@@ -43,6 +43,7 @@ def main():
         display.display()
     except KeyboardInterrupt:
         print("Closing...")
+        logger.flush()
 
 
 if __name__ == "__main__":
