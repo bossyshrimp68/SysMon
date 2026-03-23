@@ -1,5 +1,3 @@
-import threading
-
 from rich.align import Align
 from rich.layout import Layout
 from rich.live import Live
@@ -7,6 +5,10 @@ from rich.panel import Panel
 from rich.table import Table
 import time
 import collector
+
+"""
+Creates a live layout to display the data from collector.
+"""
 
 DELAY_SECONDS = 2
 REFRESH_PER_SECOND = 1
@@ -104,7 +106,7 @@ def partitions_panel():
             str(data["total"]),
             str(data["used"]),
             str(data["available"]),
-            str(data["percent"])
+            f"{data['percent']}%"
         )
 
     partition_panel = Panel(

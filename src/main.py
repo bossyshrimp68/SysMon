@@ -1,10 +1,14 @@
 import argparse
 import os.path
-import time
 
 import display
 import collector
 import logger
+
+"""
+Excepts the flags from the parser, unites the logger, collector and display.
+This class initiates all the threads and calls the display.
+"""
 
 DEFAULT_INTERVAL_VALUE = 2
 
@@ -33,7 +37,7 @@ def get_log_path():
 
 
 def main():
-    collector.initiate_threads()
+    collector.initiate_threads(get_interval())
 
     log_path = get_log_path()
     if log_path:
@@ -43,6 +47,7 @@ def main():
         display.display()
     except KeyboardInterrupt:
         print("Closing...")
+        logger.flush()
 
 
 if __name__ == "__main__":
