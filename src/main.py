@@ -1,10 +1,14 @@
 import argparse
 import os.path
-import time
 
 import display
 import collector
 import logger
+
+"""
+Excepts the flags from the parser, unites the logger, collector and display.
+Main initiates all the threads and calls the display.
+"""
 
 DEFAULT_INTERVAL_VALUE = 2
 

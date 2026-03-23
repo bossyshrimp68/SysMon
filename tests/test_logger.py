@@ -1,8 +1,7 @@
 import logging
 import sys
 
-sys.path.insert(0, "../src")  # so it will recognise src.collector
-
+sys.path.insert(0, "../src")  # so it will recognise src.logger
 import src.logger as logger
 
 

@@ -4,6 +4,12 @@ import time
 from pythonjsonlogger.json import JsonFormatter
 import collector
 
+"""
+Logs the data from collector every logging interval, allows warning and error logging.
+All in json format, with timestamps.
+main.py verifies that the path is correct.
+"""
+
 LOGGER_NAME = "sysmon"
 LOG_INTERVALS_SECONDS = 5
 HANDLER_INDEX = 0
@@ -34,13 +40,13 @@ def log_info():
 
 
 def log_warning(message, data=None):
-    if not data:
+    if data is None:
         data = {}
     logger.warning(message, extra=data)
 
 
 def log_error(message, data=None):
-    if not data:
+    if data is None:
         data = {}
     logger.error(message, extra=data)
 

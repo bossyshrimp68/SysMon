@@ -6,6 +6,11 @@ from psutil._common import bytes2human
 
 import logger
 
+"""
+Using psutil, collector gets cpu usage, partitions data and ram stats. 
+all three run on separate threads.
+"""
+
 MEMORY_STATS_END_INDEX = 4
 ROUND_UP_TO = 2
 
@@ -20,7 +25,7 @@ ram_data = {
     "total": '',
     "used": '',
     "available": '',
-    "percent": ''
+    "percent": 0
 }
 
 partitions_data = {}
@@ -132,8 +137,8 @@ def get_partitions_data():
 def get_all_data():
     """ returns all data as a dict, without cores with 0 usage """
     cpu_stats = get_cpu_data()
-    cores_list = cpu_stats["cores"].copy()
-    no_zeros = [x for x in cores_list if x != 0.0]
+    cores_usage = cpu_stats["cores"].copy()
+    no_zeros = [usage for usage in cores_usage if usage != 0.0]
     cpu_stats["cores"] = sorted(no_zeros, reverse=True)
 
     return {
