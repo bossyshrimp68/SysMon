@@ -2,6 +2,7 @@ import logging
 import threading
 import time
 from pythonjsonlogger.json import JsonFormatter
+
 import collector
 
 """
@@ -13,12 +14,18 @@ Main.py verifies that the path is correct.
 LOGGER_NAME = "sysmon"
 LOG_INTERVALS_SECONDS = 5
 HANDLER_INDEX = 0
+ERROR_COLOR = "#F50083"
+WARNING_COLOR = "#E83F98"
 
 logger = logging.getLogger(LOGGER_NAME)
 start_time = time.time()
 
 
-def initiate_logging(path):
+def initiate_logging(path=None):
+    if path is None:
+        logger.addHandler(logging.NullHandler())
+        return
+
     handler = logging.FileHandler(filename=path)
     handler.setFormatter(JsonFormatter(
         "%(asctime)s %(levelname)s"
@@ -41,14 +48,16 @@ def log_info():
 
 def log_warning(message, data=None):
     if data is None:
-        data = {}
-    logger.warning(message, extra=data)
+        logger.log(logging.WARNING, message)
+    else:
+        logger.log(logging.WARNING, message, extra={"data": data})
 
 
 def log_error(message, data=None):
     if data is None:
-        data = {}
-    logger.error(message, extra=data)
+        logger.log(logging.ERROR, message)
+    else:
+        logger.log(logging.ERROR, message, extra={"data": data})
 
 
 def flush():

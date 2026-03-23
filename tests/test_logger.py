@@ -18,7 +18,7 @@ def test_initiate_logging(mocker, tmp_path):
 def test_log_warning_no_data(mocker):
     mock_warning = mocker.patch.object(logger.logger, "warning")  # patch logger.warning
     logger.log_warning("warning")
-    mock_warning.assert_called_once_with("warning", extra={})
+    mock_warning.assert_called_once_with("warning")
 
 
 def test_log_warning_with_data(mocker):
@@ -30,7 +30,7 @@ def test_log_warning_with_data(mocker):
 def test_log_error_no_data(mocker):
     mock_warning = mocker.patch.object(logger.logger, "error")  # patch logger.error
     logger.log_error("error")
-    mock_warning.assert_called_once_with("error", extra={})
+    mock_warning.assert_called_once_with("error")
 
 
 def test_log_error_with_data(mocker):
