@@ -81,7 +81,7 @@ def test_get_disk_stats_valid_path(mocker):
 
 
 def test_get_disk_stats_invalid_path(mocker):
-    """ Path is invalid if it doesn't exist or if it disconnects. invalid_path must be before path os.path! """
+    """ Path is invalid if it doesn't exist or if it disconnects. invalid_path must be before patch os.path! """
     mocker.patch("logger.log_error")
 
     invalid_path = collector.get_disk_stats("invalid_path")  # if path doesn't exist
