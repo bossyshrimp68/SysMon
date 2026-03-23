@@ -7,7 +7,7 @@ import collector
 """
 Logs the data from collector every logging interval, allows warning and error logging.
 All in json format, with timestamps.
-main.py verifies that the path is correct.
+Main.py verifies that the path is correct.
 """
 
 LOGGER_NAME = "sysmon"

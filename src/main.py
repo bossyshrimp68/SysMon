@@ -7,7 +7,7 @@ import logger
 
 """
 Excepts the flags from the parser, unites the logger, collector and display.
-Main initiates all the threads and calls the display.
+This class initiates all the threads and calls the display.
 """
 
 DEFAULT_INTERVAL_VALUE = 2

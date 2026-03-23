@@ -32,9 +32,7 @@ def test_update_partitions_data(mocker):
     mock_partition = mocker.Mock()
     mock_partition.mountpoint = "D:\\"
     mocker.patch("collector.psutil.disk_partitions", return_value=[mock_partition])
-    mocker.patch.object(collector, "get_disk_stats", return_value={  # .Object because it is an internal function
-        "data": 0
-    })
+    mocker.patch.object(collector, "get_disk_stats", return_value={"data": 0})
 
     collector.update_partitions_stats()
     partitions_data = collector.get_partitions_data()
@@ -83,6 +81,7 @@ def test_get_disk_stats_valid_path(mocker):
 
 
 def test_get_disk_stats_invalid_path(mocker):
+    """ Path is invalid if it doesn't exist or if it disconnects. invalid_path must be before path os.path! """
     mocker.patch("logger.log_error")
 
     invalid_path = collector.get_disk_stats("invalid_path")  # if path doesn't exist

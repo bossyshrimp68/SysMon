@@ -8,7 +8,7 @@ import logger
 
 """
 Using psutil, collector gets cpu usage, partitions data and ram stats. 
-all three run on separate threads.
+All three run on separate threads.
 """
 
 MEMORY_STATS_END_INDEX = 4
@@ -60,7 +60,7 @@ def update_partitions_stats():
         path = partition.mountpoint
         disk_stats = get_disk_stats(path)
         if not disk_stats:
-            partitions_data.pop(path, None)  # returns None if path isn't in the data
+            partitions_data.pop(path, None)  # returns None in case path isn't in the data
         else:
             partitions_data[path] = get_disk_stats(path)
 
@@ -95,6 +95,7 @@ def convert_to_human_format(stats):
 
 def initiate_threads(interval):
     global cpu_update_interval
+
     cpu_update_interval = interval
 
     cpu_thread = threading.Thread(target=cpu_thread_function, daemon=True)
@@ -122,18 +123,6 @@ def partitions_thread_function():
         update_partitions_stats()
 
 
-def get_cpu_data():
-    return cpu_data.copy()
-
-
-def get_ram_data():
-    return ram_data.copy()
-
-
-def get_partitions_data():
-    return partitions_data.copy()
-
-
 def get_all_data():
     """ returns all data as a dict, without cores with 0 usage """
     cpu_stats = get_cpu_data()
@@ -146,3 +135,15 @@ def get_all_data():
         "ram": get_ram_data(),
         "partitions": get_partitions_data()
     }
+
+
+def get_cpu_data():
+    return cpu_data.copy()
+
+
+def get_ram_data():
+    return ram_data.copy()
+
+
+def get_partitions_data():
+    return partitions_data.copy()
