@@ -15,11 +15,11 @@ Creates a live layout to display the data from collector.
 
 DELAY_SECONDS = 2
 REFRESH_PER_SECOND = 1
-DEFAULT_COLOR = "#81E3F7"  # blue
-CPU_COLOR = "#FF5ED6"  # pink
-RAM_COLOR = "#C2F268"  # green
-PARTITIONS_COLOR = "#A87EF7"  # purple
-FINISHED_BAR_COLOR = "#FF213A"  # red
+DEFAULT_COLOR = "#33C6D7"  # blue
+CPU_COLOR = "#FF70C3"  # pink
+RAM_COLOR = "#90EB5C"  # green
+PARTITIONS_COLOR = "#B86FD8"  # purple
+FINISHED_BAR_COLOR = "#EF4854"  # red
 DEFAULT_BOX_TYPE = box.DOUBLE_EDGE
 TABLE_BOX_TYPE = box.DOUBLE_EDGE
 
@@ -121,7 +121,7 @@ def ram_panel():
 
 
 def partitions_panel():
-    partitions_table = Table(show_edge=False, border_style=PARTITIONS_COLOR, expand=True)
+    partitions_table = Table(show_edge=False, border_style=PARTITIONS_COLOR, expand=True, padding=(1, 2))
 
     partitions_table.add_column("Path")
     partitions_table.add_column("Total memory")
