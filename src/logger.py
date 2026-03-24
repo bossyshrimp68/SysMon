@@ -18,7 +18,11 @@ logger = logging.getLogger(LOGGER_NAME)
 start_time = time.time()
 
 
-def initiate_logging(path):
+def initiate_logging(path=None):
+    if path is None:
+        logger.addHandler(logging.NullHandler())
+        return
+
     handler = logging.FileHandler(filename=path)
     handler.setFormatter(JsonFormatter(
         "%(asctime)s %(levelname)s"
@@ -41,14 +45,16 @@ def log_info():
 
 def log_warning(message, data=None):
     if data is None:
-        data = {}
-    logger.warning(message, extra=data)
+        logger.log(logging.WARNING, message)
+    else:
+        logger.log(logging.WARNING, message, extra={"data": data})
 
 
 def log_error(message, data=None):
     if data is None:
-        data = {}
-    logger.error(message, extra=data)
+        logger.log(logging.ERROR, message)
+    else:
+        logger.log(logging.ERROR, message, extra={"data": data})
 
 
 def flush():

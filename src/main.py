@@ -39,15 +39,14 @@ def get_log_path():
 def main():
     collector.initiate_threads(get_interval())
 
-    log_path = get_log_path()
-    if log_path:
-        logger.initiate_logging(log_path)
+    logger.initiate_logging(get_log_path())
 
     try:
         display.display()
     except KeyboardInterrupt:
         print("Closing...")
-        logger.flush()
+        if get_log_path():
+            logger.flush()
 
 
 if __name__ == "__main__":
