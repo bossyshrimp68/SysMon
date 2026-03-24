@@ -2,7 +2,6 @@ import logging
 import threading
 import time
 from pythonjsonlogger.json import JsonFormatter
-
 import collector
 
 """
@@ -14,8 +13,6 @@ Main.py verifies that the path is correct.
 LOGGER_NAME = "sysmon"
 LOG_INTERVALS_SECONDS = 5
 HANDLER_INDEX = 0
-ERROR_COLOR = "#F50083"
-WARNING_COLOR = "#E83F98"
 
 logger = logging.getLogger(LOGGER_NAME)
 start_time = time.time()

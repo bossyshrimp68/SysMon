@@ -16,24 +16,24 @@ def test_initiate_logging(mocker, tmp_path):
 
 
 def test_log_warning_no_data(mocker):
-    mock_warning = mocker.patch.object(logger.logger, "warning")  # patch logger.warning
+    mock_log = mocker.patch("logger.logger.log")
     logger.log_warning("warning")
-    mock_warning.assert_called_once_with("warning")
+    print(mock_log.assert_called_once_with(logging.WARNING, "warning"))
 
 
 def test_log_warning_with_data(mocker):
-    mock_warning = mocker.patch.object(logger.logger, "warning")  # patch logger.warning
+    mock_log = mocker.patch("logger.logger.log")
     logger.log_warning("warning", "extra")
-    mock_warning.assert_called_once_with("warning", extra="extra")
+    mock_log.assert_called_once_with(logging.WARNING, "warning", extra={"data": "extra"})
 
 
 def test_log_error_no_data(mocker):
-    mock_warning = mocker.patch.object(logger.logger, "error")  # patch logger.error
+    mock_log = mocker.patch("logger.logger.log")
     logger.log_error("error")
-    mock_warning.assert_called_once_with("error")
+    mock_log.assert_called_once_with(logging.ERROR, "error")
 
 
 def test_log_error_with_data(mocker):
-    mock_warning = mocker.patch.object(logger.logger, "error")  # patch logger.error
+    mock_log = mocker.patch("logger.logger.log")
     logger.log_error("error", "extra")
-    mock_warning.assert_called_once_with("error", extra="extra")
+    mock_log.assert_called_once_with(logging.ERROR, "error", extra={"data": "extra"})

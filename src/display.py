@@ -21,7 +21,6 @@ RAM_COLOR = "#90EB5C"  # green
 PARTITIONS_COLOR = "#B86FD8"  # purple
 FINISHED_BAR_COLOR = "#EF4854"  # red
 DEFAULT_BOX_TYPE = box.DOUBLE_EDGE
-TABLE_BOX_TYPE = box.DOUBLE_EDGE
 
 
 def create_layout():
@@ -51,12 +50,12 @@ def footer():
 
 
 def cpu_panel():
-    cpu_data = collector.get_cpu_data()
-
     cpu_table = Table(show_edge=False, border_style=CPU_COLOR, expand=True, leading=1)
 
+    cpu_data = collector.get_cpu_data()
+
     average_cpu_bar = ProgressBar(completed=cpu_data["average"], complete_style=DEFAULT_COLOR)
-    cpu_table.add_column("Average", width=7)  # name
+    cpu_table.add_column("Average", width=7)  # core
     cpu_table.add_column(average_cpu_bar, width=25)  # bar
     cpu_table.add_column(f"{cpu_data['average']}%", width=7)  # percentage
 
@@ -73,7 +72,7 @@ def cpu_panel():
         ),
         padding=(2, 0),
         title="CPU",
-        box=TABLE_BOX_TYPE,
+        box=DEFAULT_BOX_TYPE,
         border_style=CPU_COLOR,
     )
     return cpu_panel
@@ -112,7 +111,7 @@ def ram_panel():
         padding=(2, 0),
         expand=True,
         title="RAM",
-        box=TABLE_BOX_TYPE,
+        box=DEFAULT_BOX_TYPE,
         border_style=RAM_COLOR,
         width=100,
         height=20,
@@ -146,7 +145,7 @@ def partitions_panel():
         ),
         padding=(2, 0),
         title="Partitions",
-        box=TABLE_BOX_TYPE,
+        box=DEFAULT_BOX_TYPE,
         border_style=PARTITIONS_COLOR,
         width=100,
         height=20
