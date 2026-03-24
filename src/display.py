@@ -1,3 +1,4 @@
+from rich import box
 from rich.align import Align
 from rich.console import Group
 from rich.layout import Layout
@@ -14,44 +15,37 @@ Creates a live layout to display the data from collector.
 
 DELAY_SECONDS = 2
 REFRESH_PER_SECOND = 1
-DEFAULT_COLOR = "#FF5ED6"  # pink
-CPU_COLOR = "#A87EF7"  # purple
-RAM_COLOR = "#81E3F7"  # blue
-PARTITIONS_COLOR = "#C2F268"  # green
+DEFAULT_COLOR = "#81E3F7"  # blue
+CPU_COLOR = "#FF5ED6"  # pink
+RAM_COLOR = "#C2F268"  # green
+PARTITIONS_COLOR = "#A87EF7"  # purple
 FINISHED_BAR_COLOR = "#FF213A"  # red
+DEFAULT_BOX_TYPE = box.DOUBLE_EDGE
+TABLE_BOX_TYPE = box.DOUBLE_EDGE
 
 
 def create_layout():
     layout = Layout(name="sysmon")
-    layout.split(
-        Layout(name="header", size=3),
-        Layout(name="main", ratio=1),
-        Layout(name="footer", size=3)
+    layout.split_row(
+        Layout(name="panels"),
+        Layout(name="cpu", size=75),
     )
-    layout["main"].split_row(
-        Layout(name="left"),
-        Layout(name="cpu"),
+    layout["panels"].split(
+        Layout(name="ram", ratio=1),
+        Layout(name="partitions"),
+        Layout(name="footer", size=5)
     )
-    layout["left"].split(Layout(name="ram"), Layout(name="partitions"))
     return layout
-
-
-def header():
-    header_message = "System Monitoring CLI Tool"
-    header_panel = Panel(
-        Align.center(
-            header_message
-        ),
-        border_style=DEFAULT_COLOR,
-    )
-    return header_panel
 
 
 def footer():
     footer_message = "Press Ctrl + C to exit:)"
     footer_panel = Panel(
         footer_message,
+        box=DEFAULT_BOX_TYPE,
         border_style=DEFAULT_COLOR,
+        width=100,
+        padding=(1, 2)
     )
     return footer_panel
 
@@ -59,7 +53,7 @@ def footer():
 def cpu_panel():
     cpu_data = collector.get_cpu_data()
 
-    cpu_table = Table(show_edge=False, border_style=CPU_COLOR)
+    cpu_table = Table(show_edge=False, border_style=CPU_COLOR, expand=True, leading=1)
 
     average_cpu_bar = ProgressBar(completed=cpu_data["average"], complete_style=DEFAULT_COLOR)
     cpu_table.add_column("Average", width=7)  # name
@@ -77,14 +71,23 @@ def cpu_panel():
         Align.center(
             cpu_table
         ),
+        padding=(2, 0),
         title="CPU",
+        box=TABLE_BOX_TYPE,
         border_style=CPU_COLOR,
     )
     return cpu_panel
 
 
 def ram_panel():
-    ram_table = Table(show_edge=False, show_header=False, border_style=RAM_COLOR)
+    ram_table = Table(
+        show_edge=False,
+        show_header=False,
+        border_style=RAM_COLOR,
+        width=30,
+        padding=(1, 1),
+        expand=True
+    )
 
     ram_data = collector.get_ram_data()
 
@@ -97,24 +100,28 @@ def ram_panel():
         total=100,
         completed=ram_data['percent'],
         complete_style=DEFAULT_COLOR,
-        finished_style=FINISHED_BAR_COLOR
+        finished_style=FINISHED_BAR_COLOR,
+        width=60
     )
 
     ram_panel = Panel(
         Group(
-            Align.center(
-                ram_table
-            ),
-            bar
+            Align.center(ram_table),
+            Align.center(bar)  # doesn't work if I align the group
         ),
+        padding=(2, 0),
+        expand=True,
         title="RAM",
+        box=TABLE_BOX_TYPE,
         border_style=RAM_COLOR,
+        width=100,
+        height=20,
     )
     return ram_panel
 
 
 def partitions_panel():
-    partitions_table = Table(show_edge=False, border_style=PARTITIONS_COLOR)
+    partitions_table = Table(show_edge=False, border_style=PARTITIONS_COLOR, expand=True)
 
     partitions_table.add_column("Path")
     partitions_table.add_column("Total memory")
@@ -137,14 +144,17 @@ def partitions_panel():
         Align.center(
             partitions_table
         ),
+        padding=(2, 0),
         title="Partitions",
+        box=TABLE_BOX_TYPE,
         border_style=PARTITIONS_COLOR,
+        width=100,
+        height=20
     )
     return partition_panel
 
 
 layout = create_layout()
-layout["header"].update(header())
 layout["footer"].update(footer())
 layout["cpu"].update(cpu_panel())
 layout["ram"].update(ram_panel())
