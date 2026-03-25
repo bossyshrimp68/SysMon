@@ -2,7 +2,7 @@ import logging
 import threading
 import time
 from pythonjsonlogger.json import JsonFormatter
-import collector
+from sys_mon import collector
 
 """
 Logs the data from collector every logging interval, allows warning and error logging.

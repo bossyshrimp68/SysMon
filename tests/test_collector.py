@@ -1,7 +1,4 @@
-import sys
-
-sys.path.insert(0, "../src")  # so it will recognise src.collector
-import src.collector as collector
+import sys_mon.collector as collector
 
 
 def test_update_cpu_data(mocker):

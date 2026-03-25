@@ -1,8 +1,5 @@
 import logging
-import sys
-
-sys.path.insert(0, "../src")  # so it will recognise src.logger
-import src.logger as logger
+import sys_mon.logger as logger
 
 
 def test_initiate_logging(mocker, tmp_path):
