@@ -1,17 +1,17 @@
 import ast
 import tempfile
-from pathlib import Path
 
 import sys_mon.logger as logger
 
+FAKE_LOGGING_TIME = -5
 
-def initiate_logging(mocker):
+def initiate_test_logging(mocker):
     mocker.patch("threading.Thread")  # don't start the thread
 
     temp_file = tempfile.NamedTemporaryFile(delete=False)
     temp_file.close()
 
-    logger.initiate_logging(Path(temp_file.name))
+    logger.initiate_logging(temp_file.name)
     return temp_file.name
 
 
@@ -22,9 +22,9 @@ def read_json_line(file_path):
 
 
 def test_log_info(mocker):
-    file_path = initiate_logging(mocker)
+    file_path = initiate_test_logging(mocker)
 
-    mocker.patch("sys_mon.logger.start_time", -5)
+    mocker.patch("sys_mon.logger.start_time", FAKE_LOGGING_TIME)
     mocker.patch("sys_mon.collector.get_all_data", return_value={"data": "info"})
 
     logger.log_info()
@@ -36,7 +36,7 @@ def test_log_info(mocker):
 
 
 def test_log_warning_no_data(mocker):
-    file_path = initiate_logging(mocker)
+    file_path = initiate_test_logging(mocker)
 
     logger.log_warning("warning")
     content = read_json_line(file_path)
@@ -47,7 +47,7 @@ def test_log_warning_no_data(mocker):
 
 
 def test_log_warning_with_data(mocker):
-    file_path = initiate_logging(mocker)
+    file_path = initiate_test_logging(mocker)
 
     logger.log_warning("warning", "extra")
     content = read_json_line(file_path)
@@ -59,7 +59,7 @@ def test_log_warning_with_data(mocker):
 
 
 def test_log_error_no_data(mocker):
-    file_path = initiate_logging(mocker)
+    file_path = initiate_test_logging(mocker)
 
     logger.log_error("error")
     content = read_json_line(file_path)
@@ -70,7 +70,7 @@ def test_log_error_no_data(mocker):
 
 
 def test_log_error_with_data(mocker):
-    file_path = initiate_logging(mocker)
+    file_path = initiate_test_logging(mocker)
 
     logger.log_error("error", "extra")
     content = read_json_line(file_path)
