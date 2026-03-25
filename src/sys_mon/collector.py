@@ -18,14 +18,14 @@ cpu_update_interval = 0
 
 cpu_data = {
     "average": 0.0,
-    "cores": []
+    "cores": [],
 }
 
 ram_data = {
     "total": '',
     "used": '',
     "available": '',
-    "percent": 0
+    "percent": 0,
 }
 
 partitions_data = {}
@@ -68,7 +68,7 @@ def update_partitions_stats():
 def get_disk_stats(path):
     """ given a partition, returns its total, used, available memory, and used memory percentage """
     if not os.path.exists(path):
-        logger.log_error("Path doesn't exist", path)
+        logger.log_warning("Path doesn't exist", path)
         return None
 
     try:
@@ -84,7 +84,7 @@ def get_disk_stats(path):
         "total": total,
         "used": used,
         "available": available,
-        "percent": percent
+        "percent": percent,
     }
 
 
@@ -133,7 +133,7 @@ def get_all_data():
     return {
         "cpu": cpu_stats,
         "ram": get_ram_data(),
-        "partitions": get_partitions_data()
+        "partitions": get_partitions_data(),
     }
 
 

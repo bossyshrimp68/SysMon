@@ -1,36 +1,81 @@
-import logging
+import ast
+import tempfile
+
 import sys_mon.logger as logger
 
+FAKE_LOGGING_TIME = -5
 
-def test_initiate_logging(mocker, tmp_path):
-    log_file = tmp_path / "test.txt"
+def initiate_test_logging(mocker):
     mocker.patch("threading.Thread")  # don't start the thread
 
-    logger.initiate_logging(str(log_file))
+    temp_file = tempfile.NamedTemporaryFile(delete=False)
+    temp_file.close()
 
-    assert logger.logger.hasHandlers()  # handler was added
-    assert logger.logger.level == logging.INFO
+    logger.initiate_logging(temp_file.name)
+    return temp_file.name
+
+
+def read_json_line(file_path):
+    with open(file_path, 'r') as file:
+        content = file.readline()
+    return ast.literal_eval(content)
+
+
+def test_log_info(mocker):
+    file_path = initiate_test_logging(mocker)
+
+    mocker.patch("sys_mon.logger.start_time", FAKE_LOGGING_TIME)
+    mocker.patch("sys_mon.collector.get_all_data", return_value={"data": "info"})
+
+    logger.log_info()
+    content = read_json_line(file_path)
+
+    assert content.__contains__("asctime")
+    assert content["levelname"] == "INFO"
+    assert content["data"] == "info"
 
 
 def test_log_warning_no_data(mocker):
-    mock_log = mocker.patch("sys_mon.logger.logger.log")
+    file_path = initiate_test_logging(mocker)
+
     logger.log_warning("warning")
-    print(mock_log.assert_called_once_with(logging.WARNING, "warning"))
+    content = read_json_line(file_path)
+
+    assert content.__contains__("asctime")
+    assert content["levelname"] == "WARNING"
+    assert content["message"] == "warning"
 
 
 def test_log_warning_with_data(mocker):
-    mock_log = mocker.patch("sys_mon.logger.logger.log")
+    file_path = initiate_test_logging(mocker)
+
     logger.log_warning("warning", "extra")
-    mock_log.assert_called_once_with(logging.WARNING, "warning", extra={"data": "extra"})
+    content = read_json_line(file_path)
+
+    assert content.__contains__("asctime")
+    assert content["levelname"] == "WARNING"
+    assert content["message"] == "warning"
+    assert content["extra"] == "extra"
 
 
 def test_log_error_no_data(mocker):
-    mock_log = mocker.patch("sys_mon.logger.logger.log")
+    file_path = initiate_test_logging(mocker)
+
     logger.log_error("error")
-    mock_log.assert_called_once_with(logging.ERROR, "error")
+    content = read_json_line(file_path)
+
+    assert content.__contains__("asctime")
+    assert content["levelname"] == "ERROR"
+    assert content["message"] == "error"
 
 
 def test_log_error_with_data(mocker):
-    mock_log = mocker.patch("sys_mon.logger.logger.log")
+    file_path = initiate_test_logging(mocker)
+
     logger.log_error("error", "extra")
-    mock_log.assert_called_once_with(logging.ERROR, "error", extra={"data": "extra"})
+    content = read_json_line(file_path)
+
+    assert content.__contains__("asctime")
+    assert content["levelname"] == "ERROR"
+    assert content["message"] == "error"
+    assert content["extra"] == "extra"

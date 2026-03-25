@@ -32,7 +32,7 @@ def create_layout():
     layout["panels"].split(
         Layout(name="ram", ratio=1),
         Layout(name="partitions"),
-        Layout(name="footer", size=5)
+        Layout(name="footer", size=5),
     )
     return layout
 
@@ -44,7 +44,7 @@ def footer():
         box=DEFAULT_BOX_TYPE,
         border_style=DEFAULT_COLOR,
         width=100,
-        padding=(1, 2)
+        padding=(1, 2),
     )
     return footer_panel
 
@@ -63,13 +63,11 @@ def cpu_panel():
         cpu_table.add_row(
             f"Core{i}",
             ProgressBar(completed=percent, complete_style=DEFAULT_COLOR, finished_style=FINISHED_BAR_COLOR),
-            f"{percent}%"
+            f"{percent}%",
         )
 
     cpu_panel = Panel(
-        Align.center(
-            cpu_table
-        ),
+        Align.center(cpu_table),
         padding=(2, 0),
         title="CPU",
         box=DEFAULT_BOX_TYPE,
@@ -85,7 +83,7 @@ def ram_panel():
         border_style=RAM_COLOR,
         width=30,
         padding=(1, 1),
-        expand=True
+        expand=True,
     )
 
     ram_data = collector.get_ram_data()
@@ -100,7 +98,7 @@ def ram_panel():
         completed=ram_data['percent'],
         complete_style=DEFAULT_COLOR,
         finished_style=FINISHED_BAR_COLOR,
-        width=60
+        width=60,
     )
 
     ram_panel = Panel(
@@ -136,19 +134,17 @@ def partitions_panel():
             str(data["total"]),
             str(data["used"]),
             str(data["available"]),
-            f"{data['percent']}%"
+            f"{data['percent']}%",
         )
 
     partition_panel = Panel(
-        Align.center(
-            partitions_table
-        ),
+        Align.center(partitions_table),
         padding=(2, 0),
         title="Partitions",
         box=DEFAULT_BOX_TYPE,
         border_style=PARTITIONS_COLOR,
         width=100,
-        height=20
+        height=20,
     )
     return partition_panel
 

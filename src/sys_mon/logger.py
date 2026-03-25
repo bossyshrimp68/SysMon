@@ -30,31 +30,37 @@ def initiate_logging(path=None):
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
-    logger_thread = threading.Thread(target=log_info, daemon=True)
+    logger_thread = threading.Thread(target=thread_function, daemon=True)
     logger_thread.start()
 
 
 def log_info():
     global start_time
+    current_time = time.time()
+    if (current_time - start_time) >= LOG_INTERVALS_SECONDS:
+        logger.log(logging.INFO, collector.get_all_data())
+        start_time = current_time
+
+
+def thread_function():
     while True:
-        current_time = time.time()
-        if (current_time - start_time) >= LOG_INTERVALS_SECONDS:
-            logger.log(logging.INFO, collector.get_all_data())
-            start_time = current_time
+        log_info()
 
 
 def log_warning(message, data=None):
+    message = {"message": message}
     if data is None:
         logger.log(logging.WARNING, message)
     else:
-        logger.log(logging.WARNING, message, extra={"data": data})
+        logger.log(logging.WARNING, message, extra={"extra": data})
 
 
 def log_error(message, data=None):
+    message = {"message": message}
     if data is None:
         logger.log(logging.ERROR, message)
     else:
-        logger.log(logging.ERROR, message, extra={"data": data})
+        logger.log(logging.ERROR, message, extra={"extra": data})
 
 
 def flush():
