@@ -6,7 +6,7 @@ from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 import time
-import collector
+from sys_mon import collector
 from rich.progress_bar import ProgressBar
 
 """

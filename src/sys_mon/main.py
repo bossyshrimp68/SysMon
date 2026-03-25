@@ -1,9 +1,7 @@
 import argparse
 import os.path
 
-import display
-import collector
-import logger
+from sys_mon import collector, display, logger
 
 """
 Excepts the flags from the parser, unites the logger, collector and display.

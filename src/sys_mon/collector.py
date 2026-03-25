@@ -4,7 +4,7 @@ import threading
 import psutil
 from psutil._common import bytes2human
 
-import logger
+from sys_mon import logger
 
 """
 Using psutil, collector gets cpu usage, partitions data and ram stats. 
