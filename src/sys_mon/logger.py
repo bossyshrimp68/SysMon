@@ -48,17 +48,19 @@ def thread_function():
 
 
 def log_warning(message, data=None):
+    message = {"message": message}
     if data is None:
         logger.log(logging.WARNING, message)
     else:
-        logger.log(logging.WARNING, message, extra={"data": data})
+        logger.log(logging.WARNING, message, extra={"extra": data})
 
 
 def log_error(message, data=None):
+    message = {"message": message}
     if data is None:
         logger.log(logging.ERROR, message)
     else:
-        logger.log(logging.ERROR, message, extra={"data": data})
+        logger.log(logging.ERROR, message, extra={"extra": data})
 
 
 def flush():
