@@ -16,15 +16,13 @@ author = [
 maintainer = [
     { name = "Romy Pine", email = "romypine007@gmail.com" }
 ]
-license = "MIT"  # people can use the code but must credit me
+license = "MIT"  # people can use the code
 license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.8"
 
-
 [project.optional-dependencies]
 test = ["pytest"]
-
 
 [project.scripts]
 sys-mon = "sys_mon.main:main"   # this creates the CLI command

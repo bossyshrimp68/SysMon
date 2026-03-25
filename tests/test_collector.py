@@ -1,8 +1,9 @@
+import sys_mon
 import sys_mon.collector as collector
 
 
 def test_update_cpu_data(mocker):
-    mocker.patch("collector.psutil.cpu_percent", return_value=[25.0, 75.0, 50.0, 100.0])
+    mocker.patch("sys_mon.collector.psutil.cpu_percent", return_value=[25.0, 75.0, 50.0, 100.0])
 
     collector.update_cpu_percentage()
     cpu_data = collector.get_cpu_data()
@@ -12,7 +13,7 @@ def test_update_cpu_data(mocker):
 
 
 def test_update_ram_data(mocker):
-    mocker.patch("collector.psutil.virtual_memory", return_value=[100, 70, 30.0, 900])
+    mocker.patch("sys_mon.collector.psutil.virtual_memory", return_value=[100, 70, 30.0, 900])
 
     collector.update_ram_stats()
     ram_data = collector.get_ram_data()
@@ -28,8 +29,8 @@ def test_update_partitions_data(mocker):
 
     mock_partition = mocker.Mock()
     mock_partition.mountpoint = "D:\\"
-    mocker.patch("collector.psutil.disk_partitions", return_value=[mock_partition])
-    mocker.patch.object(collector, "get_disk_stats", return_value={"data": 0})
+    mocker.patch("sys_mon.collector.psutil.disk_partitions", return_value=[mock_partition])
+    mocker.patch.object(sys_mon.collector, "get_disk_stats", return_value={"data": 0})
 
     collector.update_partitions_stats()
     partitions_data = collector.get_partitions_data()
@@ -43,8 +44,8 @@ def test_invalid_update_partitions_data(mocker):
 
     mock_partition = mocker.Mock()
     mock_partition.mountpoint = "invalid"
-    mocker.patch("collector.psutil.disk_partitions", return_value=[mock_partition])
-    mocker.patch.object(collector, "get_disk_stats", return_value=None)
+    mocker.patch("sys_mon.collector.psutil.disk_partitions", return_value=[mock_partition])
+    mocker.patch.object(sys_mon.collector, "get_disk_stats", return_value=None)
 
     collector.update_partitions_stats()
     partitions_data = collector.get_partitions_data()
@@ -66,8 +67,8 @@ def test_get_all_data(mocker):
 
 
 def test_get_disk_stats_valid_path(mocker):
-    mocker.patch("collector.os.path.exists", return_value=True)
-    mocker.patch("collector.psutil.disk_usage", return_value=[100, 900, 70, 30.0])
+    mocker.patch("sys_mon.collector.os.path.exists", return_value=True)
+    mocker.patch("sys_mon.collector.psutil.disk_usage", return_value=[100, 900, 70, 30.0])
 
     disk_stats = collector.get_disk_stats("path")
 
@@ -79,11 +80,11 @@ def test_get_disk_stats_valid_path(mocker):
 
 def test_get_disk_stats_invalid_path(mocker):
     """ Path is invalid if it doesn't exist or if it disconnects. invalid_path must be before patch os.path! """
-    mocker.patch("logger.log_error")
+    mocker.patch("sys_mon.logger.log_error")
 
     invalid_path = collector.get_disk_stats("invalid_path")  # if path doesn't exist
 
-    mocker.patch("collector.os.path.exists", return_value=True)
+    mocker.patch("sys_mon.collector.os.path.exists", return_value=True)
 
     disconnected_path = collector.get_disk_stats("path")  # path is invalid and os is patched -> as if disconnection
 
