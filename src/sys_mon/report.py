@@ -42,6 +42,9 @@ def get_data_by_date(date: str, log_path: str):
                 print("Not a valid file. must contain only json lines")
                 sys.exit(-1)
 
+    if not content_in_date:
+        print("Date isn't in log file")
+        sys.exit(-1)
     return content_in_date
 
 
