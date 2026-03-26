@@ -16,6 +16,8 @@ DEFAULT_INTERVAL_VALUE = 2
 parser = argparse.ArgumentParser()
 parser.add_argument("--interval", required=False, type=int, help="Interval for cpu calculations, default is 2 seconds")
 parser.add_argument("--log", required=False, type=str, help="A path for logging")
+parser.add_argument("--cpu-warn", required=False, type=int, help="Threshold for total cpu percentage")
+parser.add_argument("--mem-warn", required=False, help="Threshold for ram percentage")
 
 subparsers = parser.add_subparsers(dest='command', help="Subcommands")
 
@@ -57,7 +59,28 @@ def get_log_path():
         if not os.path.exists(log_path):
             print("Path doesn't exist!")
             sys.exit(-1)
-    return log_path
+        return log_path
+    return None
+
+
+def get_cpu_threshold():
+    threshold = args.cpu_threshold
+    if threshold:
+        if not 0 < threshold < 100:
+            print("Threshold must be between 0 and 100!")
+            sys.exit(-1)
+        return threshold
+    return None
+
+
+def get_ram_threshold():
+    threshold = args.ram_threshold
+    if threshold:
+        if not 0 < threshold < 100:
+            print("Threshold must be between 0 and 100!")
+            sys.exit(-1)
+        return threshold
+    return None
 
 
 def main():
