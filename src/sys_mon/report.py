@@ -1,13 +1,20 @@
 import json
 import sys
 
+"""
+Receives a json log file and a date, and from the data in the file on that date returns:
+- min, avg, max average cpu usage percentages
+- min, avg, max used ram percentage
+- min, avg, max used percentage for each partition
+"""
+
 
 def generate_report(date: str, log_path: str):
-    """ returns a dict with the min, avg, max values percentages for cpu, ram and partitions in a given log file """
+    """ Returns a dict with the min, avg, max values percentages for cpu, ram and partitions in a given log file """
     data_list = get_data_by_date(date, log_path)
     cpu_usages, ram_usages, partitions_usages = split_data(data_list)
-    partition_min_avg_max = {}
 
+    partition_min_avg_max = {}
     for partition, stats in partitions_usages.items():
         partition_min_avg_max[partition] = min_avg_max(stats)
 
@@ -25,7 +32,7 @@ def get_data_by_date(date: str, log_path: str):
         for line in log_file:
             try:
                 log = json.loads(line)
-                log_date = log["asctime"].split()[0]
+                log_date = log["asctime"].split()[0]  # to get rid of the time
                 if log_date == date:
                     content_in_date.append(log)
                 if log_date > date:

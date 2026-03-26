@@ -163,7 +163,6 @@ def report_display(report_data: dict):
             for partition, values in stats.items():
                 min, avg, max = values
                 report_table.add_row(partition, min, avg, max)
-
         else:
             min, avg, max = stats
             report_table.add_row(sector, min, avg, max)
@@ -181,10 +180,10 @@ def report_display(report_data: dict):
 
 def display():
     layout = create_layout()
-    layout["footer"].update(footer())
     layout["cpu"].update(cpu_panel())
     layout["ram"].update(ram_panel())
     layout["partitions"].update(partitions_panel())
+    layout["footer"].update(footer())
     with Live(layout, refresh_per_second=REFRESH_PER_SECOND, screen=True):
         while True:
             layout["cpu"].update(cpu_panel())
