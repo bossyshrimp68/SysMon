@@ -38,7 +38,7 @@ def log_info():
     global start_time
     current_time = time.time()
     if (current_time - start_time) >= LOG_INTERVALS_SECONDS:
-        logger.log(logging.INFO, collector.get_all_data())
+        logger.info(collector.get_all_data())
         start_time = current_time
 
 
@@ -50,17 +50,17 @@ def thread_function():
 def log_warning(message, data=None):
     message = {"message": message}
     if data is None:
-        logger.log(logging.WARNING, message)
+        logger.warning(message)
     else:
-        logger.log(logging.WARNING, message, extra={"extra": data})
+        logger.warning(message, extra={"extra": data})
 
 
 def log_error(message, data=None):
     message = {"message": message}
     if data is None:
-        logger.log(logging.ERROR, message)
+        logger.error(message)
     else:
-        logger.log(logging.ERROR, message, extra={"extra": data})
+        logger.error(message, extra={"extra": data})
 
 
 def flush():

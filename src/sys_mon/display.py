@@ -1,12 +1,12 @@
 from rich import box
 from rich.align import Align
-from rich.console import Group
+from rich.console import Group, Console
 from rich.layout import Layout
 from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 import time
-from sys_mon import collector
+from sys_mon import collector, report
 from rich.progress_bar import ProgressBar
 
 """
@@ -44,7 +44,7 @@ def footer():
         box=DEFAULT_BOX_TYPE,
         border_style=DEFAULT_COLOR,
         width=100,
-        padding=(1, 2),
+        padding=(1, 2)
     )
     return footer_panel
 
@@ -71,7 +71,7 @@ def cpu_panel():
         padding=(2, 0),
         title="CPU",
         box=DEFAULT_BOX_TYPE,
-        border_style=CPU_COLOR,
+        border_style=CPU_COLOR
     )
     return cpu_panel
 
@@ -83,7 +83,7 @@ def ram_panel():
         border_style=RAM_COLOR,
         width=30,
         padding=(1, 1),
-        expand=True,
+        expand=True
     )
 
     ram_data = collector.get_ram_data()
@@ -112,7 +112,7 @@ def ram_panel():
         box=DEFAULT_BOX_TYPE,
         border_style=RAM_COLOR,
         width=100,
-        height=20,
+        height=20
     )
     return ram_panel
 
@@ -144,19 +144,48 @@ def partitions_panel():
         box=DEFAULT_BOX_TYPE,
         border_style=PARTITIONS_COLOR,
         width=100,
-        height=20,
+        height=20
     )
     return partition_panel
 
 
-layout = create_layout()
-layout["footer"].update(footer())
-layout["cpu"].update(cpu_panel())
-layout["ram"].update(ram_panel())
-layout["partitions"].update(partitions_panel())
+def report_display(report_data: dict):
+    console = Console()
+
+    report_table = Table(show_edge=False, border_style=CPU_COLOR, expand=True, padding=(1, 2))
+
+    report_table.add_column()
+    report_table.add_column("Minimum")
+    report_table.add_column("Average")
+    report_table.add_column("Maximum")
+
+    for sector, stats in report_data.items():
+        if sector == "partitions":
+            for partition, values in stats:
+                min, avg, max = values
+                report_table.add_row(partition, min, avg, max)
+
+        else:
+            min, avg, max = stats
+            report_table.add_row(sector, min, avg, max)
+
+    report_panel = Panel(
+        Align.center(report_table),
+        expand=True,
+        padding=(2, 0),
+        title="Report",
+        box=DEFAULT_BOX_TYPE,
+        border_style=CPU_COLOR,
+    )
+    console.print(report_panel)
 
 
 def display():
+    layout = create_layout()
+    layout["footer"].update(footer())
+    layout["cpu"].update(cpu_panel())
+    layout["ram"].update(ram_panel())
+    layout["partitions"].update(partitions_panel())
     with Live(layout, refresh_per_second=REFRESH_PER_SECOND, screen=True):
         while True:
             layout["cpu"].update(cpu_panel())
