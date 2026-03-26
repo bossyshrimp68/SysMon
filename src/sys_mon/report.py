@@ -32,7 +32,6 @@ def get_data_by_date(date: str, log_path: str):
     content_in_date = []
     with open(log_path, 'r') as log_file:
         for line in log_file:
-            print(line)
             try:
                 log = json.loads(line)
                 log_date = log["asctime"].split()[0]  # to get rid of the time

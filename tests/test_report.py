@@ -3,7 +3,7 @@ import tempfile
 import sys_mon.report as report
 
 """
-This class tests the function in report.py. 
+This class tests the functions in report.py. 
 NOTICE!!! the constants rely on each other. if you change one, modify the rest accordingly.
 """
 
@@ -24,7 +24,7 @@ FILE_DATA = (r'{"asctime": "2026-03-25 15:31:02,200", "levelname": "INFO", "cpu"
              r'"percent": 88.0}, "partitions": {"C:\\": {"total": "930.6G", "used": "551.8G", "available": "378.8G", '
              r'"percent": 59.3}}}')
 
-DATA_LIST_BY_DATE = [
+DATA_BY_DATE = [
     {
         "asctime": "2026-03-26 15:31:07,200", "levelname": "INFO",
         "cpu": {"average": 26.77, "cores": [75.8, 66.9, 59.8, 57.7]},
@@ -72,11 +72,11 @@ def test_get_data_by_date():
 
     data = report.get_data_by_date(DATE, temp_file.name)
 
-    assert data == DATA_LIST_BY_DATE
+    assert data == DATA_BY_DATE
 
 
 def test_split_data():
-    sliced_data = report.split_data(DATA_LIST_BY_DATE)
+    sliced_data = report.split_data(DATA_BY_DATE)
     assert sliced_data == SLICED_DATA
 
 
