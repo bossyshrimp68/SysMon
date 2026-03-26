@@ -8,6 +8,8 @@ Receives a json log file and a date, and from the data in the file on that date 
 - min, avg, max used percentage for each partition
 """
 
+DIGITS_TO_ROUND = 3
+
 
 def generate_report(date: str, log_path: str):
     """ Returns a dict with the min, avg, max values percentages for cpu, ram and partitions in a given log file """
@@ -30,6 +32,7 @@ def get_data_by_date(date: str, log_path: str):
     content_in_date = []
     with open(log_path, 'r') as log_file:
         for line in log_file:
+            print(line)
             try:
                 log = json.loads(line)
                 log_date = log["asctime"].split()[0]  # to get rid of the time
@@ -72,6 +75,6 @@ def min_avg_max(data):
 
     min = data[0]
     max = data[-1]
-    avg = sum(data) / len(data)
+    avg = (sum(data) / len(data)).__round__(DIGITS_TO_ROUND)
 
     return f'{min}%', f'{avg}%', f'{max}%'
