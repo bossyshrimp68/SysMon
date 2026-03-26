@@ -64,4 +64,4 @@ def min_avg_max(data):
     max = data[-1]
     avg = sum(data) / len(data)
 
-    return min, avg, max
+    return f'{min}%', f'{avg}%', f'{max}%'

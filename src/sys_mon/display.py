@@ -151,7 +151,6 @@ def partitions_panel():
 
 def report_display(report_data: dict):
     console = Console()
-
     report_table = Table(show_edge=False, border_style=CPU_COLOR, expand=True, padding=(1, 2))
 
     report_table.add_column()
@@ -161,7 +160,7 @@ def report_display(report_data: dict):
 
     for sector, stats in report_data.items():
         if sector == "partitions":
-            for partition, values in stats:
+            for partition, values in stats.items():
                 min, avg, max = values
                 report_table.add_row(partition, min, avg, max)
 
