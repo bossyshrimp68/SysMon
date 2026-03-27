@@ -4,7 +4,7 @@ import os.path
 import sys
 import time
 
-from sys_mon import collector, display, logger, report
+from sys_mon import collector, display, logger, report, threshold_monitor
 
 """
 Excepts the flags from the parser, unites the logger, collector and display.
@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--interval", required=False, type=int, help="Interval for cpu calculations, default is 2 seconds")
 parser.add_argument("--log", required=False, type=str, help="A path for logging")
 parser.add_argument("--cpu-warn", required=False, type=int, help="Threshold for total cpu percentage")
-parser.add_argument("--mem-warn", required=False, help="Threshold for ram percentage")
+parser.add_argument("--mem-warn", required=False, type=int, help="Threshold for ram percentage")
 
 subparsers = parser.add_subparsers(dest='command', help="Subcommands")
 
@@ -63,24 +63,19 @@ def get_log_path():
     return None
 
 
-def get_cpu_threshold():
-    threshold = args.cpu_threshold
+def get_thresholds():
+    cpu_threshold = valid_threshold(args.cpu_warn)
+    ram_threshold = valid_threshold(args.mem_warn)
+    return cpu_threshold, ram_threshold
+
+
+def valid_threshold(threshold):
     if threshold:
         if not 0 < threshold < 100:
             print("Threshold must be between 0 and 100!")
             sys.exit(-1)
         return threshold
-    return None
-
-
-def get_ram_threshold():
-    threshold = args.ram_threshold
-    if threshold:
-        if not 0 < threshold < 100:
-            print("Threshold must be between 0 and 100!")
-            sys.exit(-1)
-        return threshold
-    return None
+    return 100
 
 
 def main():
@@ -88,8 +83,9 @@ def main():
         if args.command == 'report':
             display.report_display(generate_report())
         else:
-            collector.initiate_threads(get_interval())
+            collector.initiate_collector(get_interval())
             logger.initiate_logging(get_log_path())
+            threshold_monitor.initiate_monitor(get_thresholds())
             display.display()
 
     except KeyboardInterrupt:
