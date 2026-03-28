@@ -1,5 +1,6 @@
 import os.path
 import threading
+import time
 
 import psutil
 from psutil._common import bytes2human
@@ -12,7 +13,8 @@ All three run on separate threads.
 """
 
 MEMORY_STATS_END_INDEX = 4
-ROUND_UP_TO = 2
+ROUND_UP_TO_DIGITS = 2
+NETWORK_SPEED_INTERVAL = 5
 
 cpu_update_interval = 0
 
@@ -30,12 +32,17 @@ ram_data = {
 
 partitions_data = {}
 
+network_data = {
+    "upload": '',
+    "download": ''
+}
+
 
 def update_cpu_percentage():
     """ updates average cpu usage, and usage percentage for each core every interval """
     cores = psutil.cpu_percent(interval=cpu_update_interval, percpu=True)
     total = sum(cores)
-    average_usage = (total / len(cores)).__round__(ROUND_UP_TO)
+    average_usage = (total / len(cores)).__round__(ROUND_UP_TO_DIGITS)
     cores.sort(reverse=True)
     cpu_data["average"] = average_usage
     cpu_data["cores"] = cores
@@ -88,6 +95,27 @@ def get_disk_stats(path):
     }
 
 
+def update_upload_download():
+    """ Calculated delta bytes / delta seconds for upload and download speed, for all the interfaces combined """
+    start_time = time.time()
+    counter = psutil.net_io_counters(pernic=True)
+    start_upload_bytes = sum(s.bytes_sent for s in counter.values())
+    start_download_bytes = sum(s.bytes_recv for s in counter.values())
+
+    time.sleep(NETWORK_SPEED_INTERVAL)
+
+    end_time = time.time()
+    counter = psutil.net_io_counters(pernic=True)
+    end_upload_bytes = sum(s.bytes_sent for s in counter.values())
+    end_download_bytes = sum(s.bytes_recv for s in counter.values())
+
+    upload_speed = ((end_upload_bytes - start_upload_bytes) / (end_time - start_time)).__round__(ROUND_UP_TO_DIGITS)
+    download_speed = ((end_download_bytes - start_download_bytes) / (end_time - start_time)).__round__(ROUND_UP_TO_DIGITS)
+
+    network_data["upload"] = f"{upload_speed} Bps"
+    network_data["download"] = f"{download_speed} Bps"
+
+
 def convert_to_human_format(stats):
     formatted_stats = [bytes2human(stat) for stat in stats]
     return tuple(formatted_stats)
@@ -107,6 +135,9 @@ def initiate_collector(interval):
     partition_thread = threading.Thread(target=partitions_thread_function, daemon=True)
     partition_thread.start()
 
+    network_thread = threading.Thread(target=network_thread_function, daemon=True)
+    network_thread.start()
+
 
 def cpu_thread_function():
     while True:
@@ -123,6 +154,11 @@ def partitions_thread_function():
         update_partitions_stats()
 
 
+def network_thread_function():
+    while True:
+        update_upload_download()
+
+
 def get_all_data():
     """ returns all data as a dict, without cores with 0 usage """
     cpu_stats = get_cpu_data()
@@ -134,6 +170,7 @@ def get_all_data():
         "cpu": cpu_stats,
         "ram": get_ram_data(),
         "partitions": get_partitions_data(),
+        "network": get_network_data()
     }
 
 
@@ -147,3 +184,7 @@ def get_ram_data():
 
 def get_partitions_data():
     return partitions_data.copy()
+
+
+def get_network_data():
+    return network_data.copy()
