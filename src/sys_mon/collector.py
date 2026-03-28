@@ -93,7 +93,7 @@ def convert_to_human_format(stats):
     return tuple(formatted_stats)
 
 
-def initiate_threads(interval):
+def initiate_collector(interval):
     global cpu_update_interval
 
     cpu_update_interval = interval

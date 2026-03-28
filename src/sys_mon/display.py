@@ -6,8 +6,8 @@ from rich.live import Live
 from rich.panel import Panel
 from rich.table import Table
 import time
-from sys_mon import collector, report
 from rich.progress_bar import ProgressBar
+from sys_mon import collector, threshold_monitor
 
 """
 Creates a live layout to display the data from collector.
@@ -19,7 +19,7 @@ DEFAULT_COLOR = "#33C6D7"  # blue
 CPU_COLOR = "#FF70C3"  # pink
 RAM_COLOR = "#90EB5C"  # green
 PARTITIONS_COLOR = "#B86FD8"  # purple
-FINISHED_BAR_COLOR = "#EF4854"  # red
+WARNING_COLOR = "#EF4854"  # red
 DEFAULT_BOX_TYPE = box.DOUBLE_EDGE
 
 
@@ -50,9 +50,10 @@ def footer():
 
 
 def cpu_panel():
-    cpu_table = Table(show_edge=False, border_style=CPU_COLOR, expand=True, leading=1)
-
     cpu_data = collector.get_cpu_data()
+
+    color = WARNING_COLOR if threshold_monitor.cpu_breached() else CPU_COLOR
+    cpu_table = Table(show_edge=False, border_style=color, expand=True, leading=1)
 
     average_cpu_bar = ProgressBar(completed=cpu_data["average"], complete_style=DEFAULT_COLOR)
     cpu_table.add_column("Average", width=7)  # core
@@ -62,7 +63,7 @@ def cpu_panel():
     for i, percent in enumerate(cpu_data["cores"]):
         cpu_table.add_row(
             f"Core{i}",
-            ProgressBar(completed=percent, complete_style=DEFAULT_COLOR, finished_style=FINISHED_BAR_COLOR),
+            ProgressBar(completed=percent, complete_style=DEFAULT_COLOR, finished_style=WARNING_COLOR),
             f"{percent}%",
         )
 
@@ -71,22 +72,23 @@ def cpu_panel():
         padding=(2, 0),
         title="CPU",
         box=DEFAULT_BOX_TYPE,
-        border_style=CPU_COLOR
+        border_style=color
     )
     return cpu_panel
 
 
 def ram_panel():
+    ram_data = collector.get_ram_data()
+
+    color = WARNING_COLOR if threshold_monitor.ram_breached() else RAM_COLOR
     ram_table = Table(
         show_edge=False,
         show_header=False,
-        border_style=RAM_COLOR,
+        border_style=color,
         width=30,
         padding=(1, 1),
         expand=True
     )
-
-    ram_data = collector.get_ram_data()
 
     ram_table.add_row("Total memory", str(ram_data["total"]))
     ram_table.add_row("Used memory", str(ram_data["used"]))
@@ -97,7 +99,7 @@ def ram_panel():
         total=100,
         completed=ram_data['percent'],
         complete_style=DEFAULT_COLOR,
-        finished_style=FINISHED_BAR_COLOR,
+        finished_style=WARNING_COLOR,
         width=60,
     )
 
@@ -110,7 +112,7 @@ def ram_panel():
         expand=True,
         title="RAM",
         box=DEFAULT_BOX_TYPE,
-        border_style=RAM_COLOR,
+        border_style=color,
         width=100,
         height=20
     )
@@ -184,6 +186,7 @@ def display():
     layout["ram"].update(ram_panel())
     layout["partitions"].update(partitions_panel())
     layout["footer"].update(footer())
+
     with Live(layout, refresh_per_second=REFRESH_PER_SECOND, screen=True):
         while True:
             layout["cpu"].update(cpu_panel())

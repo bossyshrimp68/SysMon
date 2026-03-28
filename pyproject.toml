@@ -11,6 +11,7 @@ requires-python = ">=3.8"
 dependencies = [
     "rich",
     "psutil",
+    "plyer",
 ]
 author = [
     { name = "Romy Pine", email = "romypine007@gmail.com" },
