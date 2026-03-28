@@ -2,7 +2,6 @@ import argparse
 import datetime
 import os.path
 import sys
-import time
 
 from sys_mon import collector, display, logger, report, threshold_monitor
 

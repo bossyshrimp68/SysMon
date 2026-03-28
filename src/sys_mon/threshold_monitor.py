@@ -7,6 +7,7 @@ from sys_mon import collector
 CPU_INTERVAL = 25
 RAM_INTERVAL = 25
 NOTIFICATION_TIMEOUT = 5
+THREAD_SLEEP = 1
 
 cpu_threshold = 0
 ram_threshold = 0
@@ -16,8 +17,8 @@ def initiate_monitor(thresholds):
     global cpu_threshold, ram_threshold
     cpu_threshold, ram_threshold = thresholds
 
-    cpu_thread = threading.Thread(target=thread_func, daemon=True)
-    cpu_thread.start()
+    monitoring_thread = threading.Thread(target=thread_func, daemon=True)
+    monitoring_thread.start()
 
 
 def cpu_breached():
@@ -39,8 +40,6 @@ def notify(message):
 
 
 def thread_func():
-    global cpu_threshold, ram_threshold
-
     cpu_timer = -CPU_INTERVAL
     ram_timer = -RAM_INTERVAL
 
@@ -52,3 +51,5 @@ def thread_func():
         if ram_breached() and (time.time() - ram_timer >= RAM_INTERVAL):
             notify(f"ram threshold {ram_threshold}% breached")
             ram_timer = time.time()
+
+        time.sleep(THREAD_SLEEP)
