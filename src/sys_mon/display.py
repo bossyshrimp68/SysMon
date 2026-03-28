@@ -18,7 +18,9 @@ REFRESH_PER_SECOND = 1
 DEFAULT_COLOR = "#33C6D7"  # blue
 CPU_COLOR = "#FF70C3"  # pink
 RAM_COLOR = "#90EB5C"  # green
-PARTITIONS_COLOR = "#B86FD8"  # purple
+FOOTER_COLOR = "#B86FD8"  # purple
+PARTITIONS_COLOR = DEFAULT_COLOR
+NETWORK_COLOR = FOOTER_COLOR
 WARNING_COLOR = "#EF4854"  # red
 DEFAULT_BOX_TYPE = box.DOUBLE_EDGE
 
@@ -30,26 +32,34 @@ def create_layout():
         Layout(name="cpu", size=75),
     )
     layout["panels"].split(
-        Layout(name="ram", ratio=1),
+        Layout(name="upper", ratio=1),
+        Layout(name="lower", size=26)
+    )
+    layout["upper"].split_row(
+        Layout(name="network"),
+        Layout(name="ram", size=65)
+    )
+    layout["lower"].split(
         Layout(name="partitions"),
         Layout(name="footer", size=5),
     )
     return layout
 
 
-def footer():
+def generate_footer():
     footer_message = "Press Ctrl + C to exit:)"
+
     footer_panel = Panel(
-        footer_message,
+        Align.left(footer_message),
         box=DEFAULT_BOX_TYPE,
-        border_style=DEFAULT_COLOR,
+        border_style=FOOTER_COLOR,
         width=100,
         padding=(1, 2)
     )
     return footer_panel
 
 
-def cpu_panel():
+def generate_cpu_panel():
     cpu_data = collector.get_cpu_data()
 
     color = WARNING_COLOR if threshold_monitor.cpu_breached() else CPU_COLOR
@@ -77,7 +87,7 @@ def cpu_panel():
     return cpu_panel
 
 
-def ram_panel():
+def generate_ram_panel():
     ram_data = collector.get_ram_data()
 
     color = WARNING_COLOR if threshold_monitor.ram_breached() else RAM_COLOR
@@ -100,26 +110,63 @@ def ram_panel():
         completed=ram_data['percent'],
         complete_style=DEFAULT_COLOR,
         finished_style=WARNING_COLOR,
-        width=60,
+        width=50,
     )
 
     ram_panel = Panel(
         Group(
             Align.center(ram_table),
+            "",  # space
             Align.center(bar)  # doesn't work if I align the group
         ),
-        padding=(2, 0),
+        padding=(2, 2),
         expand=True,
         title="RAM",
         box=DEFAULT_BOX_TYPE,
         border_style=color,
-        width=100,
+        width=61,
         height=20
     )
     return ram_panel
 
 
-def partitions_panel():
+def generate_network_panel():
+    network_table = Table(
+        show_edge=False,
+        show_header=False,
+        border_style=NETWORK_COLOR,
+        width=30,
+        padding=(1, 1),
+        expand=True,
+    )
+
+    network_data = collector.get_network_data()
+    network_table.add_row("Upload", network_data["upload"])
+    network_table.add_row("Download", network_data["download"])
+
+    description1 = "Network speed"
+    description2 = "across all interfaces"
+
+    network_panel = Panel(
+        Group(
+            Align.center(network_table),
+            "\n",
+            Align.center(description1),
+            "",
+            Align.center(description2)
+        ),
+        padding=(2, 0),
+        expand=True,
+        title="NETWORK",
+        box=DEFAULT_BOX_TYPE,
+        border_style=NETWORK_COLOR,
+        width=35,
+        height=20
+    )
+    return network_panel
+
+
+def generate_partitions_panel():
     partitions_table = Table(show_edge=False, border_style=PARTITIONS_COLOR, expand=True, padding=(1, 2))
 
     partitions_table.add_column("Path")
@@ -182,14 +229,17 @@ def report_display(report_data: dict):
 
 def display():
     layout = create_layout()
-    layout["cpu"].update(cpu_panel())
-    layout["ram"].update(ram_panel())
-    layout["partitions"].update(partitions_panel())
-    layout["footer"].update(footer())
+    layout["cpu"].update(generate_cpu_panel())
+    layout["network"].update(generate_network_panel())
+    layout["ram"].update(generate_ram_panel())
+    layout["partitions"].update(generate_partitions_panel())
+    layout["footer"].update(generate_footer())
 
     with Live(layout, refresh_per_second=REFRESH_PER_SECOND, screen=True):
         while True:
-            layout["cpu"].update(cpu_panel())
-            layout["ram"].update(ram_panel())
-            layout["partitions"].update(partitions_panel())
+            layout["cpu"].update(generate_cpu_panel())
+            layout["network"].update(generate_network_panel())
+            layout["ram"].update(generate_ram_panel())
+            layout["partitions"].update(generate_partitions_panel())
+            layout["footer"].update(generate_footer())
             time.sleep(DELAY_SECONDS)
