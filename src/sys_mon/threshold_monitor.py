@@ -4,8 +4,8 @@ from plyer import notification
 
 from sys_mon import collector
 
-CPU_INTERVAL = 25
-RAM_INTERVAL = 25
+CPU_INTERVAL_SECONDS = 25
+RAM_INTERVAL_SECONDS = 25
 NOTIFICATION_TIMEOUT = 5
 THREAD_SLEEP = 1
 
@@ -40,16 +40,16 @@ def notify(message):
 
 
 def thread_func():
-    cpu_timer = -CPU_INTERVAL
-    ram_timer = -RAM_INTERVAL
+    cpu_timer = -CPU_INTERVAL_SECONDS
+    ram_timer = -RAM_INTERVAL_SECONDS
 
     while True:
-        if cpu_breached() and (time.time() - cpu_timer >= CPU_INTERVAL):
+        if cpu_breached() and (time.time() - cpu_timer >= CPU_INTERVAL_SECONDS):
             notify(f"cpu threshold {cpu_threshold}% breached")
             cpu_timer = time.time()
 
-        if ram_breached() and (time.time() - ram_timer >= RAM_INTERVAL):
-            notify(f"ram threshold {ram_threshold}% breached")
+        if ram_breached() and (time.time() - ram_timer >= RAM_INTERVAL_SECONDS):
+            notify(f"memory threshold {ram_threshold}% breached")
             ram_timer = time.time()
 
         time.sleep(THREAD_SLEEP)
