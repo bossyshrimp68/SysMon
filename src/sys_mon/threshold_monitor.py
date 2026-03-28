@@ -1,10 +1,12 @@
-import asyncio
-import signal
 import threading
+import time
+import tkinter as tk
+from tkinter import simpledialog
 
 from sys_mon import collector
 
-from desktop_notifier import DesktopNotifier, Urgency, Button, ReplyField, DEFAULT_SOUND
+CPU_INTERVAL = 15
+RAM_INTERVAL = 15
 
 cpu_threshold = 0
 ram_threshold = 0
@@ -28,44 +30,48 @@ def ram_breached():
     return ram_percentage > ram_threshold
 
 
-# def notify():
+def get_user_input(response):
+    if (response == "") or (response == None):  # None means user pressed cancel or dismiss
+        return 0
+
+    try:
+        user_input = int(response)
+        if 0 < user_input < 100:
+            return user_input
+        return None
+    except ValueError:
+        return None
 
 
-async def main() -> None:
-    notifier = DesktopNotifier(app_name="System monitor")
-
-    await notifier.send(
-        title="Threshold breach",
-        message="Et tu, Brute?",
-        urgency=Urgency.Critical,
-        buttons=[
-            Button(
-                title="Mark as read",
-                on_pressed=lambda: print("Marked as read"),
-            )
-        ],
-        reply_field=ReplyField(
-            on_replied=lambda text: print("Brutus replied:", text),
-        ),
-        on_dispatched=lambda: print("Notification showing"),
-        on_clicked=lambda: print("Notification clicked"),
-        on_dismissed=lambda: print("Notification dismissed"),
-        sound=DEFAULT_SOUND,
+def notify(message):
+    root = tk.Tk()
+    root.withdraw()  # hide the main window
+    response = simpledialog.askstring(
+        "Threshold breach",
+        f"{message}. enter a new threshold if you wish",
     )
+    user_input = get_user_input(response)
+    if user_input is None:
+        notify("Invalid input")
 
-    # # Run the event loop forever to respond to user interactions with the notification.
-    stop_event = asyncio.Event()
-    # loop = asyncio.get_running_loop()
-    #
-    # loop.add_signal_handler(signal.SIGINT, stop_event.set)
-    # loop.add_signal_handler(signal.SIGTERM, stop_event.set)
-    #
-    await stop_event.wait()
+    root.destroy()
+    return user_input
 
 
 def thread_func():
+    global cpu_threshold, ram_threshold
+
+    cpu_timer = -CPU_INTERVAL
+    ram_timer = -RAM_INTERVAL
     while True:
-        if cpu_breached():
-            asyncio.run(main())
-        if ram_breached():
-            asyncio.run(main())
+        if cpu_breached() and (time.time() - cpu_timer >= CPU_INTERVAL):
+            response = notify(f"cpu threshold {cpu_threshold}% breached")
+            cpu_timer = time.time()
+            if response != 0:
+                cpu_threshold = response
+
+        if ram_breached() and (time.time() - ram_timer >= RAM_INTERVAL):
+            response = notify(f"ram threshold {ram_threshold}% breached")
+            ram_timer = time.time()
+            if response != 0:
+                ram_threshold = response
