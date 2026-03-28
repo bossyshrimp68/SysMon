@@ -15,22 +15,14 @@ Creates a live layout to display the data from collector.
 
 DELAY_SECONDS = 2
 REFRESH_PER_SECOND = 1
-# DEFAULT_COLOR = "#33C6D7"  # blue
-# CPU_COLOR = "#FF70C3"  # pink
-# RAM_COLOR = "#90EB5C"  # green
-# PARTITIONS_COLOR = "#B86FD8"  # purple
-# NETWORK_COLOR = DEFAULT_COLOR
-# WARNING_COLOR = "#EF4854"  # red
-DEFAULT_BOX_TYPE = box.DOUBLE_EDGE
-
-
 DEFAULT_COLOR = "#33C6D7"  # blue
 CPU_COLOR = "#FF70C3"  # pink
 RAM_COLOR = "#90EB5C"  # green
 FOOTER_COLOR = "#B86FD8"  # purple
-PARTITIONS_COLOR = "#33C6D7"  # blue
-NETWORK_COLOR = "#B86FD8"  # purple
+PARTITIONS_COLOR = DEFAULT_COLOR
+NETWORK_COLOR = FOOTER_COLOR
 WARNING_COLOR = "#EF4854"  # red
+DEFAULT_BOX_TYPE = box.DOUBLE_EDGE
 
 
 def create_layout():
@@ -41,12 +33,15 @@ def create_layout():
     )
     layout["panels"].split(
         Layout(name="upper", ratio=1),
-        Layout(name="partitions"),
-        Layout(name="footer", size=5),
+        Layout(name="lower", size=26)
     )
     layout["upper"].split_row(
         Layout(name="network"),
         Layout(name="ram", size=65)
+    )
+    layout["lower"].split(
+        Layout(name="partitions"),
+        Layout(name="footer", size=5),
     )
     return layout
 
