@@ -45,11 +45,11 @@ def thread_func():
 
     while True:
         if cpu_breached() and (time.time() - cpu_timer >= CPU_INTERVAL_SECONDS):
-            notify(f"cpu threshold {cpu_threshold}% breached")
+            notify(f"cpu percentage breached the threshold: {cpu_threshold}%")
             cpu_timer = time.time()
 
         if ram_breached() and (time.time() - ram_timer >= RAM_INTERVAL_SECONDS):
-            notify(f"memory threshold {ram_threshold}% breached")
+            notify(f"memory percentage breached the threshold: {ram_threshold}%")
             ram_timer = time.time()
 
         time.sleep(THREAD_SLEEP)
