@@ -1,15 +1,13 @@
 import os.path
 import threading
 import time
-
 import psutil
 from psutil._common import bytes2human
-
 from sys_mon import logger
 
 """
-Using psutil, collector gets cpu usage, partitions data and ram stats. 
-All three run on separate threads.
+Using psutil, collector gets cpu usage, partitions data, ram stats and network upload/download speed. 
+All run on separate threads.
 """
 
 MEMORY_STATS_END_INDEX = 4
@@ -17,29 +15,25 @@ ROUND_UP_TO_DIGITS = 2
 NETWORK_SPEED_INTERVAL = 5
 
 cpu_update_interval = 0
-
 cpu_data = {
     "average": 0.0,
     "cores": [],
 }
-
 ram_data = {
     "total": '',
     "used": '',
     "available": '',
     "percent": 0,
 }
-
 partitions_data = {}
-
 network_data = {
     "upload": '',
     "download": ''
 }
 
 
-def update_cpu_percentage():
-    """ updates average cpu usage, and usage percentage for each core every interval """
+def update_cpu_data():
+    """ Every interval - updates average cpu usage, and usage percentage for each core """
     cores = psutil.cpu_percent(interval=cpu_update_interval, percpu=True)
     total = sum(cores)
     average_usage = (total / len(cores)).__round__(ROUND_UP_TO_DIGITS)
@@ -48,8 +42,8 @@ def update_cpu_percentage():
     cpu_data["cores"] = cores
 
 
-def update_ram_stats():
-    """ updates ram status in a dict """
+def update_ram_data():
+    """ Updates ram statistics """
     memory_stats = psutil.virtual_memory()[:MEMORY_STATS_END_INDEX]
     total, available, percent, used = memory_stats
     total, available, used = convert_to_human_format([total, available, used])
@@ -60,8 +54,8 @@ def update_ram_stats():
     ram_data["used"] = used
 
 
-def update_partitions_stats():
-    """ updates partition path and stats for every partition """
+def update_partitions_data():
+    """ For each partition, updates path and statistics """
     partitions_stats = psutil.disk_partitions(all=True)  # if all=False returns physical devices only
     for partition in partitions_stats:
         path = partition.mountpoint
@@ -73,13 +67,13 @@ def update_partitions_stats():
 
 
 def get_disk_stats(path):
-    """ given a partition, returns its total, used, available memory, and used memory percentage """
+    """ Given a partition, returns its total, used, available memory, and used memory percentage """
     if not os.path.exists(path):
         logger.log_warning("Path doesn't exist", path)
         return None
 
     try:
-        disk_stats = psutil.disk_usage(path)  # disk usage statistics for the given path
+        disk_stats = psutil.disk_usage(path)
     except OSError:
         logger.log_error("Partition disconnected", path)
         return None
@@ -96,7 +90,7 @@ def get_disk_stats(path):
 
 
 def update_upload_download():
-    """ Calculated delta bytes / delta seconds for upload and download speed, for all the interfaces combined """
+    """ Updates delta bytes / delta seconds for upload and download speed, across all the interfaces combined """
     start_time = time.time()
     counter = psutil.net_io_counters(pernic=True)
     start_upload_bytes = sum(s.bytes_sent for s in counter.values())
@@ -109,8 +103,9 @@ def update_upload_download():
     end_upload_bytes = sum(s.bytes_sent for s in counter.values())
     end_download_bytes = sum(s.bytes_recv for s in counter.values())
 
-    upload_speed = ((end_upload_bytes - start_upload_bytes) / (end_time - start_time)).__round__(ROUND_UP_TO_DIGITS)
-    download_speed = ((end_download_bytes - start_download_bytes) / (end_time - start_time)).__round__(ROUND_UP_TO_DIGITS)
+    delta_time = end_time - start_time
+    upload_speed = ((end_upload_bytes - start_upload_bytes) / delta_time).__round__(ROUND_UP_TO_DIGITS)
+    download_speed = ((end_download_bytes - start_download_bytes) / delta_time).__round__(ROUND_UP_TO_DIGITS)
 
     network_data["upload"] = f"{upload_speed} Bps"
     network_data["download"] = f"{download_speed} Bps"
@@ -121,10 +116,10 @@ def convert_to_human_format(stats):
     return tuple(formatted_stats)
 
 
-def initiate_collector(interval):
+def initiate_collector(cpu_interval):
     global cpu_update_interval
 
-    cpu_update_interval = interval
+    cpu_update_interval = cpu_interval
 
     cpu_thread = threading.Thread(target=cpu_thread_function, daemon=True)
     cpu_thread.start()
@@ -141,17 +136,17 @@ def initiate_collector(interval):
 
 def cpu_thread_function():
     while True:
-        update_cpu_percentage()
+        update_cpu_data()
 
 
 def ram_thread_function():
     while True:
-        update_ram_stats()
+        update_ram_data()
 
 
 def partitions_thread_function():
     while True:
-        update_partitions_stats()
+        update_partitions_data()
 
 
 def network_thread_function():
@@ -160,7 +155,7 @@ def network_thread_function():
 
 
 def get_all_data():
-    """ returns all data as a dict, without cores with 0 usage """
+    """ Returns all data as a dict, without cores with 0 usage """
     cpu_stats = get_cpu_data()
     cores_usage = cpu_stats["cores"].copy()
     no_zeros = [usage for usage in cores_usage if usage != 0.0]
@@ -169,6 +164,7 @@ def get_all_data():
     return {
         "cpu": cpu_stats,
         "ram": get_ram_data(),
+
         "partitions": get_partitions_data(),
         "network": get_network_data()
     }

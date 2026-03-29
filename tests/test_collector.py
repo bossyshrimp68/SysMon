@@ -5,7 +5,7 @@ import sys_mon.collector as collector
 def test_update_cpu_data(mocker):
     mocker.patch("sys_mon.collector.psutil.cpu_percent", return_value=[25.0, 75.0, 50.0, 100.0])
 
-    collector.update_cpu_percentage()
+    collector.update_cpu_data()
     cpu_data = collector.get_cpu_data()
 
     assert cpu_data["average"] == 62.5
@@ -32,7 +32,7 @@ def test_update_partitions_data(mocker):
     mocker.patch("sys_mon.collector.psutil.disk_partitions", return_value=[mock_partition])
     mocker.patch.object(sys_mon.collector, "get_disk_stats", return_value={"data": 0})
 
-    collector.update_partitions_stats()
+    collector.update_partitions_data()
     partitions_data = collector.get_partitions_data()
 
     disk_stats = partitions_data["D:\\"]
@@ -47,7 +47,7 @@ def test_invalid_update_partitions_data(mocker):
     mocker.patch("sys_mon.collector.psutil.disk_partitions", return_value=[mock_partition])
     mocker.patch.object(sys_mon.collector, "get_disk_stats", return_value=None)
 
-    collector.update_partitions_stats()
+    collector.update_partitions_data()
     partitions_data = collector.get_partitions_data()
 
     assert partitions_data == {}

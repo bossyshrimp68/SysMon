@@ -18,8 +18,8 @@ REFRESH_PER_SECOND = 1
 DEFAULT_COLOR = "#33C6D7"  # blue
 CPU_COLOR = "#FF70C3"  # pink
 RAM_COLOR = "#90EB5C"  # green
-FOOTER_COLOR = "#B86FD8"  # purple
-PARTITIONS_COLOR = DEFAULT_COLOR
+PARTITIONS_COLOR = "#B86FD8"  # purple
+FOOTER_COLOR = DEFAULT_COLOR
 NETWORK_COLOR = FOOTER_COLOR
 WARNING_COLOR = "#EF4854"  # red
 DEFAULT_BOX_TYPE = box.DOUBLE_EDGE
@@ -47,16 +47,15 @@ def create_layout():
 
 
 def generate_footer():
-    footer_message = "Press Ctrl + C to exit:)"
+    footer_message = "Press Ctrl + C to exit :)"
 
-    footer_panel = Panel(
+    return Panel(
         Align.left(footer_message),
         box=DEFAULT_BOX_TYPE,
         border_style=FOOTER_COLOR,
         width=100,
         padding=(1, 2)
     )
-    return footer_panel
 
 
 def generate_cpu_panel():
@@ -77,14 +76,13 @@ def generate_cpu_panel():
             f"{percent}%",
         )
 
-    cpu_panel = Panel(
+    return Panel(
         Align.center(cpu_table),
         padding=(2, 0),
         title="CPU",
         box=DEFAULT_BOX_TYPE,
         border_style=color
     )
-    return cpu_panel
 
 
 def generate_ram_panel():
@@ -105,7 +103,7 @@ def generate_ram_panel():
     ram_table.add_row("Available memory", str(ram_data["available"]))
     ram_table.add_row("Used percentage", f"{ram_data['percent']}%")
 
-    bar = ProgressBar(
+    percentage_bar = ProgressBar(
         total=100,
         completed=ram_data['percent'],
         complete_style=DEFAULT_COLOR,
@@ -113,11 +111,11 @@ def generate_ram_panel():
         width=50,
     )
 
-    ram_panel = Panel(
+    return Panel(
         Group(
             Align.center(ram_table),
             "",  # space
-            Align.center(bar)  # doesn't work if I align the group
+            Align.center(percentage_bar)
         ),
         padding=(2, 2),
         expand=True,
@@ -127,10 +125,11 @@ def generate_ram_panel():
         width=61,
         height=20
     )
-    return ram_panel
 
 
 def generate_network_panel():
+    network_data = collector.get_network_data()
+
     network_table = Table(
         show_edge=False,
         show_header=False,
@@ -140,14 +139,13 @@ def generate_network_panel():
         expand=True,
     )
 
-    network_data = collector.get_network_data()
     network_table.add_row("Upload", network_data["upload"])
     network_table.add_row("Download", network_data["download"])
 
     description1 = "Network speed"
     description2 = "across all interfaces"
 
-    network_panel = Panel(
+    return Panel(
         Group(
             Align.center(network_table),
             "\n",
@@ -163,19 +161,17 @@ def generate_network_panel():
         width=35,
         height=20
     )
-    return network_panel
 
 
 def generate_partitions_panel():
-    partitions_table = Table(show_edge=False, border_style=PARTITIONS_COLOR, expand=True, padding=(1, 2))
+    partition_data = collector.get_partitions_data()
 
+    partitions_table = Table(show_edge=False, border_style=PARTITIONS_COLOR, expand=True, padding=(1, 2))
     partitions_table.add_column("Path")
     partitions_table.add_column("Total memory")
     partitions_table.add_column("Used memory")
     partitions_table.add_column("Available memory")
     partitions_table.add_column("Used percentage")
-
-    partition_data = collector.get_partitions_data()
 
     for partition, data in partition_data.items():
         partitions_table.add_row(
@@ -186,7 +182,7 @@ def generate_partitions_panel():
             f"{data['percent']}%",
         )
 
-    partition_panel = Panel(
+    return Panel(
         Align.center(partitions_table),
         padding=(2, 0),
         title="Partitions",
@@ -195,13 +191,11 @@ def generate_partitions_panel():
         width=100,
         height=20
     )
-    return partition_panel
 
 
 def report_display(report_data: dict):
     console = Console()
     report_table = Table(show_edge=False, border_style=CPU_COLOR, expand=True, padding=(1, 2))
-
     report_table.add_column()
     report_table.add_column("Minimum")
     report_table.add_column("Average")
@@ -210,11 +204,11 @@ def report_display(report_data: dict):
     for sector, stats in report_data.items():
         if sector == "partitions":
             for partition, values in stats.items():
-                min, avg, max = values
-                report_table.add_row(partition, min, avg, max)
+                minimum, average, maximum = values
+                report_table.add_row(partition, minimum, average, maximum)
         else:
-            min, avg, max = stats
-            report_table.add_row(sector, min, avg, max)
+            minimum, average, maximum = stats
+            report_table.add_row(sector, minimum, average, maximum)
 
     report_panel = Panel(
         Align.center(report_table),
@@ -230,16 +224,15 @@ def report_display(report_data: dict):
 def display():
     layout = create_layout()
     layout["cpu"].update(generate_cpu_panel())
-    layout["network"].update(generate_network_panel())
     layout["ram"].update(generate_ram_panel())
+    layout["network"].update(generate_network_panel())
     layout["partitions"].update(generate_partitions_panel())
     layout["footer"].update(generate_footer())
 
     with Live(layout, refresh_per_second=REFRESH_PER_SECOND, screen=True):
         while True:
             layout["cpu"].update(generate_cpu_panel())
-            layout["network"].update(generate_network_panel())
             layout["ram"].update(generate_ram_panel())
+            layout["network"].update(generate_network_panel())
             layout["partitions"].update(generate_partitions_panel())
-            layout["footer"].update(generate_footer())
             time.sleep(DELAY_SECONDS)
