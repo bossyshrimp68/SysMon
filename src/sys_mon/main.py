@@ -2,7 +2,6 @@ import argparse
 import datetime
 import os.path
 import sys
-
 from sys_mon import collector, display, logger, report, threshold_monitor
 
 """
@@ -20,7 +19,7 @@ parser.add_argument("--mem-warn", required=False, type=int, help="Threshold for 
 
 subparsers = parser.add_subparsers(dest='command', help="Subcommands")
 
-report_parser = subparsers.add_parser('report', help="Generate reports from a given log file and date")
+report_parser = subparsers.add_parser('report', help="Generate a report from a given log file and date")
 report_parser.add_argument('--date', required=True, type=str, help="Date for the report")
 report_parser.add_argument("--rlog", required=True, type=str, help="Log file for the report")
 
@@ -32,13 +31,13 @@ def generate_report():
     log_path = args.rlog
 
     try:
-        date = datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")  # format to double-digit, removes time
+        date = datetime.datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")  # format to double-digit
     except ValueError:
-        print("Invalid date format! must be yyyy-mm-dd")
+        print("Invalid date format! must be y-m-d")
         sys.exit(-1)
 
     if not os.path.exists(log_path):
-        print("Path doesn't exist!")
+        print(f"Path {log_path} doesn't exist!")
         sys.exit(-1)
 
     return report.generate_report(date, log_path)
@@ -56,7 +55,7 @@ def get_log_path():
     log_path = args.log
     if log_path:
         if not os.path.exists(log_path):
-            print("Path doesn't exist!")
+            print(f"Path {log_path} doesn't exist!")
             sys.exit(-1)
         return log_path
     return None
@@ -89,8 +88,7 @@ def main():
 
     except KeyboardInterrupt:
         print("Closing...")
-        if get_log_path():
-            logger.flush()
+        logger.flush()
 
 
 if __name__ == "__main__":

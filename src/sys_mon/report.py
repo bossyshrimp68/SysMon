@@ -3,24 +3,23 @@ import sys
 
 """
 Receives a log file with json logs and a date. from the data in the file on that date returns:
-- min, avg, max average cpu usage percentages
-- min, avg, max used ram percentage
-- min, avg, max used percentage for each partition
-- min, avg, max network speed for upload and download
+- min, avg, max for cpu usage percentages
+- min, avg, max for used ram percentage
+- min, avg, max for used percentage of each partition
+- min, avg, max for network speed of upload and download
 """
 
 DIGITS_TO_ROUND = 3
 
 
 def generate_report(date: str, log_path: str):
-    """ Returns a dict with the min, avg, max values percentages for cpu, ram and partitions in a given log file """
+    """ Returns the min, avg, max values for: cpu, ram, partitions, upload and download speed in a given log file """
     data_list = get_data_by_date(date, log_path)
     cpu_usages, ram_usages, partitions_usages, network_speed = split_data(data_list)
 
     partition_min_avg_max = {}
     for partition, stats in partitions_usages.items():
         partition_min_avg_max[partition] = min_avg_max(stats, '%')
-    print(network_speed["upload"])
     upload_speed = [float(s.split()[0]) for s in network_speed["upload"]]  # to get rid of ' Bps'
     download_speed = [float(s.split()[0]) for s in network_speed["download"]]  # to get rid of ' Bps'
 
@@ -57,7 +56,8 @@ def get_data_by_date(date: str, log_path: str):
 
 
 def split_data(data_list):
-    """ returns a tuple with all cpu averages, all ram percentages, a dict with all percentages for each partition """
+    """ Returns a tuple with all cpu averages, all ram percentages, a dict with all percentages for each partition,
+     and all network speeds """
     cpu_usages = []
     ram_usages = []
     partitions_usages = {}

@@ -15,7 +15,7 @@ LOG_INTERVALS_SECONDS = 5
 HANDLER_INDEX = 0
 
 logger = logging.getLogger(LOGGER_NAME)
-start_time = time.time()
+log_time = time.time()
 
 
 def initiate_logging(path=None):
@@ -35,11 +35,11 @@ def initiate_logging(path=None):
 
 
 def log_info():
-    global start_time
+    global log_time
     current_time = time.time()
-    if (current_time - start_time) >= LOG_INTERVALS_SECONDS:
+    if (current_time - log_time) >= LOG_INTERVALS_SECONDS:
         logger.info(collector.get_all_data())
-        start_time = current_time
+        log_time = current_time
 
 
 def thread_function():
