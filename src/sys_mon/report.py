@@ -20,15 +20,15 @@ def generate_report(date: str, log_path: str):
     partition_min_avg_max = {}
     for partition, stats in partitions_usages.items():
         partition_min_avg_max[partition] = min_avg_max(stats, '%')
-    upload_speed = [float(s.split()[0]) for s in network_speed["upload"]]  # to get rid of ' Bps'
-    download_speed = [float(s.split()[0]) for s in network_speed["download"]]  # to get rid of ' Bps'
+    upload_speed = [float(s.split()[0]) for s in network_speed['upload']]  # to get rid of ' Bps'
+    download_speed = [float(s.split()[0]) for s in network_speed['download']]  # to get rid of ' Bps'
 
     return {
-        "CPU": min_avg_max(cpu_usages, '%'),
-        "RAM": min_avg_max(ram_usages, '%'),
-        "partitions": partition_min_avg_max,
-        "Upload speed": min_avg_max(upload_speed, ' Bps'),
-        "Download speed": min_avg_max(download_speed, ' Bps')
+        'CPU': min_avg_max(cpu_usages, '%'),
+        'RAM': min_avg_max(ram_usages, '%'),
+        'partitions': partition_min_avg_max,
+        'Upload speed': min_avg_max(upload_speed, ' Bps'),
+        'Download speed': min_avg_max(download_speed, ' Bps')
     }
 
 
@@ -39,14 +39,15 @@ def get_data_by_date(date: str, log_path: str):
         for line in log_file:
             try:
                 log = json.loads(line)
-                log_date = log["asctime"].split()[0]  # to get rid of the time
+                log_date = log['asctime'].split()[0]  # to get rid of the time
                 if log_date == date:
                     content_in_date.append(log)
                 if log_date > date:
                     break
 
             except Exception as e:
-                print("Not a valid file. must contain only json lines")
+                print(line)
+                print('Not a valid file. must contain only json lines')
                 sys.exit(-1)
 
     if not content_in_date:
@@ -61,21 +62,21 @@ def split_data(data_list):
     cpu_usages = []
     ram_usages = []
     partitions_usages = {}
-    network_speed = {"upload": [], "download": []}
+    network_speed = {'upload': [], 'download': []}
 
     for data in data_list:
-        if data["levelname"] == "INFO":
-            cpu_usages.append(data["cpu"]["average"])
-            ram_usages.append(data["ram"]["percent"])
-            if data["network"]["upload"]:  # initially they are both ""
-                network_speed["upload"].append(data["network"]["upload"])
-                network_speed["download"].append(data["network"]["download"])
+        if data['levelname'] == 'INFO':
+            cpu_usages.append(data['cpu']['average'])
+            ram_usages.append(data['ram']['percent'])
+            if data['network']['upload']:  # initially they are both ''
+                network_speed['upload'].append(data['network']['upload'])
+                network_speed['download'].append(data['network']['download'])
 
-            for partition, stats in data["partitions"].items():
+            for partition, stats in data['partitions'].items():
                 if partitions_usages.__contains__(partition):
-                    partitions_usages[partition].append(stats["percent"])
+                    partitions_usages[partition].append(stats['percent'])
                 else:
-                    partitions_usages[partition] = [stats["percent"]]
+                    partitions_usages[partition] = [stats['percent']]
 
     return cpu_usages, ram_usages, partitions_usages, network_speed
 

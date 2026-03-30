@@ -16,19 +16,19 @@ NETWORK_SPEED_INTERVAL = 5
 
 cpu_update_interval = 0
 cpu_data = {
-    "average": 0.0,
-    "cores": [],
+    'average': 0.0,
+    'cores': [],
 }
 ram_data = {
-    "total": '',
-    "used": '',
-    "available": '',
-    "percent": 0,
+    'total': '',
+    'used': '',
+    'available': '',
+    'percent': 0,
 }
 partitions_data = {}
 network_data = {
-    "upload": '',
-    "download": ''
+    'upload': '',
+    'download': ''
 }
 
 
@@ -38,8 +38,8 @@ def update_cpu_data():
     cores.sort(reverse=True)
     total = sum(cores)
     average_usage = (total / len(cores)).__round__(ROUND_UP_TO_DIGITS)
-    cpu_data["average"] = average_usage
-    cpu_data["cores"] = cores
+    cpu_data['average'] = average_usage
+    cpu_data['cores'] = cores
 
 
 def update_ram_data():
@@ -48,10 +48,10 @@ def update_ram_data():
     total, available, percent, used = memory_stats
     total, available, used = convert_to_human_format([total, available, used])
 
-    ram_data["total"] = total
-    ram_data["available"] = available
-    ram_data["percent"] = percent
-    ram_data["used"] = used
+    ram_data['total'] = total
+    ram_data['available'] = available
+    ram_data['percent'] = percent
+    ram_data['used'] = used
 
 
 def update_partitions_data():
@@ -75,17 +75,17 @@ def get_disk_stats(path):
     try:
         disk_stats = psutil.disk_usage(path)
     except OSError:
-        logger.log_error("Partition disconnected", path)
+        logger.log_error('Partition disconnected', path)
         return None
 
     total, used, available, percent = disk_stats
     total, used, available = convert_to_human_format([total, used, available])
 
     return {
-        "total": total,
-        "used": used,
-        "available": available,
-        "percent": percent,
+        'total': total,
+        'used': used,
+        'available': available,
+        'percent': percent,
     }
 
 
@@ -107,8 +107,8 @@ def update_network_data():
     upload_speed = ((end_upload_bytes - start_upload_bytes) / delta_time).__round__(ROUND_UP_TO_DIGITS)
     download_speed = ((end_download_bytes - start_download_bytes) / delta_time).__round__(ROUND_UP_TO_DIGITS)
 
-    network_data["upload"] = f"{upload_speed} Bps"
-    network_data["download"] = f"{download_speed} Bps"
+    network_data['upload'] = f'{upload_speed} Bps'
+    network_data['download'] = f'{download_speed} Bps'
 
 
 def convert_to_human_format(stats):
@@ -157,15 +157,15 @@ def network_thread_function():
 def get_all_data():
     """ Returns all data as a dict, without cores with 0 usage """
     cpu_stats = get_cpu_data()
-    cores_usage = cpu_stats["cores"].copy()
+    cores_usage = cpu_stats['cores'].copy()
     no_zeros = [usage for usage in cores_usage if usage != 0.0]
-    cpu_stats["cores"] = sorted(no_zeros, reverse=True)
+    cpu_stats['cores'] = sorted(no_zeros, reverse=True)
 
     return {
-        "cpu": cpu_stats,
-        "ram": get_ram_data(),
-        "partitions": get_partitions_data(),
-        "network": get_network_data()
+        'cpu': cpu_stats,
+        'ram': get_ram_data(),
+        'partitions': get_partitions_data(),
+        'network': get_network_data()
     }
 
 

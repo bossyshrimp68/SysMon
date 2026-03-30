@@ -6,7 +6,7 @@ This class tests the functions in report.py.
 NOTICE!!! the constants rely on each other. if you change one, modify the rest accordingly.
 """
 
-DATE = "2026-03-26"
+DATE = '2026-03-26'
 
 FILE_DATA = (r'{"asctime": "2026-03-25 15:31:02,200", "levelname": "INFO", "cpu": {"average": 11.51, "cores": [54.7, '
              r'46.1, 38.9, 36.7]}, "ram": {"total": "15.6G", "used": "13.7G", "available": "1.9G", "percent": 87.9}, '
@@ -30,23 +30,23 @@ FILE_DATA = (r'{"asctime": "2026-03-25 15:31:02,200", "levelname": "INFO", "cpu"
 
 DATA_BY_DATE = [
     {
-        "asctime": "2026-03-26 15:31:07,200", "levelname": "INFO",
-        "cpu": {"average": 26.77, "cores": [75.8, 66.9, 59.8, 57.7]},
-        "ram": {"total": "15.6G", "used": "13.8G", "available": "1.8G", "percent": 88.2},
-        "partitions": {
-            "C:\\": {"total": "930.6G", "used": "551.8G", "available": "378.8G", "percent": 59.3}
+        'asctime': '2026-03-26 15:31:07,200', 'levelname': 'INFO',
+        'cpu': {'average': 26.77, 'cores': [75.8, 66.9, 59.8, 57.7]},
+        'ram': {'total': '15.6G', 'used': '13.8G', 'available': '1.8G', 'percent': 88.2},
+        'partitions': {
+            'C:\\': {'total': '930.6G', 'used': '551.8G', 'available': '378.8G', 'percent': 59.3}
         },
-        "network": {"upload": "191.7 Bps", "download": "234.11 Bps"}
+        'network': {'upload': '191.7 Bps', 'download': '234.11 Bps'}
     },
     {
-        "asctime": "2026-03-26 15:31:12,208", "levelname": "INFO",
-        "cpu": {"average": 12.47, "cores": [79.4, 42.3, 41.2, 34.8]},
-        "ram": {"total": "15.6G", "used": "13.7G", "available": "1.9G", "percent": 87.9},
-        "partitions": {
-            "C:\\": {"total": "930.6G", "used": "551.8G", "available": "378.8G", "percent": 59.3},
-            "D:\\": {"total": "930.6G", "used": "551.8G", "available": "378.8G", "percent": 59.3}
+        'asctime': '2026-03-26 15:31:12,208', 'levelname': 'INFO',
+        'cpu': {'average': 12.47, 'cores': [79.4, 42.3, 41.2, 34.8]},
+        'ram': {'total': '15.6G', 'used': '13.7G', 'available': '1.9G', 'percent': 87.9},
+        'partitions': {
+            'C:\\': {'total': '930.6G', 'used': '551.8G', 'available': '378.8G', 'percent': 59.3},
+            'D:\\': {'total': '930.6G', 'used': '551.8G', 'available': '378.8G', 'percent': 59.3}
         },
-        "network": {"upload": "150.61 Bps", "download": "223.45 Bps"}
+        'network': {'upload': '150.61 Bps', 'download': '223.45 Bps'}
     }
 ]
 

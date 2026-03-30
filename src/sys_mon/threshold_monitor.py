@@ -21,18 +21,18 @@ def initiate_monitor(thresholds):
 
 
 def cpu_breached():
-    cpu_average = collector.get_cpu_data()["average"]
+    cpu_average = collector.get_cpu_data()['average']
     return cpu_average > cpu_threshold
 
 
 def ram_breached():
-    ram_percentage = collector.get_ram_data()["percent"]
+    ram_percentage = collector.get_ram_data()['percent']
     return ram_percentage > ram_threshold
 
 
 def notify(message):
     notification.notify(
-        title="Threshold breach",
+        title='Threshold breach',
         message=message,
         timeout=NOTIFICATION_TIMEOUT
     )
@@ -44,13 +44,13 @@ def thread_func():
 
     while True:
         if cpu_breached() and (time.time() - cpu_timer >= CPU_INTERVAL_SECONDS):
-            notify(f"cpu percentage breached the threshold: {cpu_threshold}%")
-            logger.log_warning("cpu breached threshold", f'{cpu_threshold}%')
+            notify(f'cpu percentage breached the threshold: {cpu_threshold}%')
+            logger.log_warning('cpu breached threshold', f'{cpu_threshold}%')
             cpu_timer = time.time()
 
         if ram_breached() and (time.time() - ram_timer >= RAM_INTERVAL_SECONDS):
-            notify(f"memory percentage breached the threshold: {ram_threshold}%")
-            logger.log_warning("ram breached threshold", f'{ram_threshold}%')
+            notify(f'memory percentage breached the threshold: {ram_threshold}%')
+            logger.log_warning('ram breached threshold', f'{ram_threshold}%')
             ram_timer = time.time()
 
         time.sleep(THREAD_SLEEP)

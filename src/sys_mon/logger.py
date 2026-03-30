@@ -10,7 +10,7 @@ All in json format, with timestamps.
 Main.py verifies that the path is correct.
 """
 
-LOGGER_NAME = "sysmon"
+LOGGER_NAME = 'sysmon'
 LOG_INTERVALS_SECONDS = 5
 HANDLER_INDEX = 0
 
@@ -25,7 +25,7 @@ def initiate_logging(path=None):
 
     handler = logging.FileHandler(filename=path)
     handler.setFormatter(JsonFormatter(
-        "%(asctime)s %(levelname)s"
+        '%(asctime)s %(levelname)s'
     ))
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
@@ -48,19 +48,19 @@ def thread_function():
 
 
 def log_warning(message, data=None):
-    message = {"message": message}
+    message = {'message': message}
     if data is None:
         logger.warning(message)
     else:
-        logger.warning(message, extra={"data": data})
+        logger.warning(message, extra={'data': data})
 
 
 def log_error(message, data=None):
-    message = {"message": message}
+    message = {'message': message}
     if data is None:
         logger.error(message)
     else:
-        logger.error(message, extra={"data": data})
+        logger.error(message, extra={'data': data})
 
 
 def flush():
