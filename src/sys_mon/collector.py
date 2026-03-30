@@ -89,7 +89,7 @@ def get_disk_stats(path):
     }
 
 
-def update_upload_download():
+def update_network_data():
     """ Updates delta bytes / delta seconds for upload and download speed, across all the interfaces combined """
     start_time = time.time()
     counter = psutil.net_io_counters(pernic=True)
@@ -151,7 +151,7 @@ def partitions_thread_function():
 
 def network_thread_function():
     while True:
-        update_upload_download()
+        update_network_data()
 
 
 def get_all_data():

@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 import sys_mon
 import sys_mon.collector as collector
 
@@ -15,7 +17,7 @@ def test_update_cpu_data(mocker):
 def test_update_ram_data(mocker):
     mocker.patch("sys_mon.collector.psutil.virtual_memory", return_value=[100, 70, 30.0, 900])
 
-    collector.update_ram_stats()
+    collector.update_ram_data()
     ram_data = collector.get_ram_data()
 
     assert ram_data["total"] == '100.0B'
@@ -53,17 +55,34 @@ def test_invalid_update_partitions_data(mocker):
     assert partitions_data == {}
 
 
+def test_update_network_data(mocker):
+    """ This test takes a while """
+    start_time, end_time = 2, 9
+    start_counter = {}
+    end_counter = {}
+    for i in range(100, 500, 100):
+        start_counter[i] = SimpleNamespace(bytes_sent=5000 - i, bytes_recv=4000 - i)  # different on purpose
+        end_counter[i] = SimpleNamespace(bytes_sent=5000 + i, bytes_recv=5000 + i)
+    mocker.patch('sys_mon.collector.psutil.net_io_counters', side_effect=[start_counter, end_counter])
+    mocker.patch('sys_mon.collector.time.time', side_effect=[start_time, end_time])
+
+    collector.update_network_data()
+    network_data = collector.get_network_data()
+
+    assert network_data['upload'] == '285.71 Bps'
+    assert network_data['download'] == '857.14 Bps'
+
+
 def test_get_all_data(mocker):
     """ The logic is only in the cores -> deletes 0.0 usages. """
-    mocker.patch.object(collector, "get_cpu_data", return_value={"cores": [0.0, 25.0, 0.0, 50.0, 75.0, 100.0]})
-    mocker.patch.object(collector, "get_ram_data", return_value={})
-    mocker.patch.object(collector, "get_partitions_data", return_value={})
+    mocker.patch.object(collector, "get_cpu_data", return_value={"cores": [0.0, 25.0, 0.0, 50.0, 75.0]})
 
     all_data = collector.get_all_data()
 
-    assert all_data["cpu"]["cores"] == [100.0, 75.0, 50.0, 25.0]
-    assert all_data["ram"] == {}
+    assert all_data["cpu"]["cores"] == [75.0, 50.0, 25.0]
+    assert all_data["ram"] == {"total": '', "used": '', "available": '', "percent": 0}
     assert all_data["partitions"] == {}
+    assert all_data['network'] == {'upload': '', 'download': ''}
 
 
 def test_get_disk_stats_valid_path(mocker):

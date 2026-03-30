@@ -1,9 +1,9 @@
 import ast
 import tempfile
-
 import sys_mon.logger as logger
 
 FAKE_LOGGING_TIME = -5
+
 
 def initiate_test_logging(mocker):
     mocker.patch("threading.Thread")  # don't start the thread

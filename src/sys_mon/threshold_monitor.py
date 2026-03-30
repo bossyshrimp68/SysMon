@@ -1,7 +1,6 @@
 import threading
 import time
 from plyer import notification
-
 from sys_mon import collector
 
 CPU_INTERVAL_SECONDS = 25
