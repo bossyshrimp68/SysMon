@@ -6,7 +6,7 @@ from psutil._common import bytes2human
 from sys_mon import logger
 
 """
-Using psutil, collector gets cpu usage, partitions data, ram stats and network upload/download speed. 
+Using psutil collector gets cpu usage, partitions data, ram stats and network upload/download speed. 
 All run on separate threads.
 """
 
@@ -35,9 +35,9 @@ network_data = {
 def update_cpu_data():
     """ Every interval - updates average cpu usage, and usage percentage for each core """
     cores = psutil.cpu_percent(interval=cpu_update_interval, percpu=True)
+    cores.sort(reverse=True)
     total = sum(cores)
     average_usage = (total / len(cores)).__round__(ROUND_UP_TO_DIGITS)
-    cores.sort(reverse=True)
     cpu_data["average"] = average_usage
     cpu_data["cores"] = cores
 
@@ -164,7 +164,6 @@ def get_all_data():
     return {
         "cpu": cpu_stats,
         "ram": get_ram_data(),
-
         "partitions": get_partitions_data(),
         "network": get_network_data()
     }

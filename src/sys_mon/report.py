@@ -6,7 +6,7 @@ Receives a log file with json logs and a date. from the data in the file on that
 - min, avg, max for cpu usage percentages
 - min, avg, max for used ram percentage
 - min, avg, max for used percentage of each partition
-- min, avg, max for network speed of upload and download
+- min, avg, max for network speed of uploading and downloading
 """
 
 DIGITS_TO_ROUND = 3
@@ -24,11 +24,11 @@ def generate_report(date: str, log_path: str):
     download_speed = [float(s.split()[0]) for s in network_speed["download"]]  # to get rid of ' Bps'
 
     return {
-        "cpu": min_avg_max(cpu_usages, '%'),
-        "ram": min_avg_max(ram_usages, '%'),
+        "CPU": min_avg_max(cpu_usages, '%'),
+        "RAM": min_avg_max(ram_usages, '%'),
         "partitions": partition_min_avg_max,
-        "upload speed": min_avg_max(upload_speed, ' Bps'),
-        "download speed": min_avg_max(download_speed, ' Bps')
+        "Upload speed": min_avg_max(upload_speed, ' Bps'),
+        "Download speed": min_avg_max(download_speed, ' Bps')
     }
 
 

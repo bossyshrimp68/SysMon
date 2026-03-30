@@ -1,7 +1,6 @@
-from types import SimpleNamespace
-
 import sys_mon
 import sys_mon.collector as collector
+from types import SimpleNamespace
 
 
 def test_update_cpu_data(mocker):
@@ -37,8 +36,7 @@ def test_update_partitions_data(mocker):
     collector.update_partitions_data()
     partitions_data = collector.get_partitions_data()
 
-    disk_stats = partitions_data["D:\\"]
-    assert disk_stats["data"] == 0
+    assert partitions_data["D:\\"]["data"] == 0
 
 
 def test_invalid_update_partitions_data(mocker):

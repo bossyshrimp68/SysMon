@@ -10,7 +10,7 @@ from rich.progress_bar import ProgressBar
 from sys_mon import collector, threshold_monitor
 
 """
-Creates a live layout to display the data from collector.
+A live layout to display the data from collector.
 """
 
 DELAY_SECONDS = 2
@@ -155,7 +155,7 @@ def generate_network_panel():
         ),
         padding=(2, 0),
         expand=True,
-        title="NETWORK",
+        title="Network",
         box=DEFAULT_BOX_TYPE,
         border_style=NETWORK_COLOR,
         width=35,

@@ -55,7 +55,7 @@ def test_log_warning_with_data(mocker):
     assert content.__contains__("asctime")
     assert content["levelname"] == "WARNING"
     assert content["message"] == "warning"
-    assert content["extra"] == "extra"
+    assert content["data"] == "extra"
 
 
 def test_log_error_no_data(mocker):
@@ -78,4 +78,4 @@ def test_log_error_with_data(mocker):
     assert content.__contains__("asctime")
     assert content["levelname"] == "ERROR"
     assert content["message"] == "error"
-    assert content["extra"] == "extra"
+    assert content["data"] == "extra"

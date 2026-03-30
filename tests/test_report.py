@@ -1,5 +1,4 @@
 import tempfile
-
 import sys_mon.report as report
 
 """
@@ -17,7 +16,9 @@ FILE_DATA = (r'{"asctime": "2026-03-25 15:31:02,200", "levelname": "INFO", "cpu"
              r'66.9, 59.8, 57.7]}, "ram": {"total": "15.6G", "used": "13.8G", "available": "1.8G", "percent": 88.2}, '
              r'"partitions": {"C:\\": {"total": "930.6G", "used": "551.8G", "available": "378.8G", "percent": 59.3}}, '
              '"network": {"upload": "191.7 Bps", "download": "234.11 Bps"}}\n'
-             r'{"asctime": "2026-03-26 15:31:12,208", "levelname": "INFO", "cpu": {"average": 12.47, "cores": [79.4, '
+             r'{"asctime": "2026-03-26 15:31:07,200", "levelname": "WARNING", "message": "cpu breached threshold", '
+             '"extra": "9%"}\n'
+             '{"asctime": "2026-03-26 15:31:12,208", "levelname": "INFO", "cpu": {"average": 12.47, "cores": [79.4,'
              r'42.3, 41.2, 34.8]}, "ram": {"total": "15.6G", "used": "13.7G", "available": "1.9G", "percent": 87.9}, '
              r'"partitions": {"C:\\": {"total": "930.6G", "used": "551.8G", "available": "378.8G", "percent": 59.3}, '
              r'"D:\\": {"total": "930.6G", "used": "551.8G", "available": "378.8G", "percent": 59.3}}, "network": {'
@@ -55,14 +56,14 @@ SLICED_DATA = (
 )
 
 FINAL_REPORT = {
-    'cpu': ('12.47%', '19.62%', '26.77%'),
-    'ram': ('87.9%', '88.05%', '88.2%'),
+    'CPU': ('12.47%', '19.62%', '26.77%'),
+    'RAM': ('87.9%', '88.05%', '88.2%'),
     'partitions': {
         'C:\\': ('59.3%', '59.3%', '59.3%'),
         'D:\\': ('59.3%', '59.3%', '59.3%')
     },
-    'upload speed': ('150.61 Bps', '171.155 Bps', '191.7 Bps'),
-    'download speed': ('223.45 Bps', '228.78 Bps', '234.11 Bps')
+    'Upload speed': ('150.61 Bps', '171.155 Bps', '191.7 Bps'),
+    'Download speed': ('223.45 Bps', '228.78 Bps', '234.11 Bps')
 }
 
 

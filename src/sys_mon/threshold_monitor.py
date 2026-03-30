@@ -1,7 +1,7 @@
 import threading
 import time
 from plyer import notification
-from sys_mon import collector
+from sys_mon import collector, logger
 
 CPU_INTERVAL_SECONDS = 25
 RAM_INTERVAL_SECONDS = 25
@@ -45,10 +45,12 @@ def thread_func():
     while True:
         if cpu_breached() and (time.time() - cpu_timer >= CPU_INTERVAL_SECONDS):
             notify(f"cpu percentage breached the threshold: {cpu_threshold}%")
+            logger.log_warning("cpu breached threshold", f'{cpu_threshold}%')
             cpu_timer = time.time()
 
         if ram_breached() and (time.time() - ram_timer >= RAM_INTERVAL_SECONDS):
             notify(f"memory percentage breached the threshold: {ram_threshold}%")
+            logger.log_warning("ram breached threshold", f'{ram_threshold}%')
             ram_timer = time.time()
 
         time.sleep(THREAD_SLEEP)

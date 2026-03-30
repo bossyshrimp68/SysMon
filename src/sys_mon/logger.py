@@ -52,7 +52,7 @@ def log_warning(message, data=None):
     if data is None:
         logger.warning(message)
     else:
-        logger.warning(message, extra={"extra": data})
+        logger.warning(message, extra={"data": data})
 
 
 def log_error(message, data=None):
@@ -60,7 +60,7 @@ def log_error(message, data=None):
     if data is None:
         logger.error(message)
     else:
-        logger.error(message, extra={"extra": data})
+        logger.error(message, extra={"data": data})
 
 
 def flush():
