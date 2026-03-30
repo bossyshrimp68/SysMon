@@ -71,7 +71,7 @@ def generate_cpu_panel():
 
     for i, percent in enumerate(cpu_data['cores']):
         cpu_table.add_row(
-            f'Core{i}',
+            f'Core {i}',
             ProgressBar(completed=percent, complete_style=DEFAULT_COLOR, finished_style=WARNING_COLOR),
             f'{percent}%',
         )
