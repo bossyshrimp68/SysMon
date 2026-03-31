@@ -10,12 +10,12 @@ All in json format, with timestamps.
 Main.py verifies that the path is correct.
 """
 
-LOGGER_NAME = "sysmon"
+LOGGER_NAME = 'sysmon'
 LOG_INTERVALS_SECONDS = 5
 HANDLER_INDEX = 0
 
 logger = logging.getLogger(LOGGER_NAME)
-start_time = time.time()
+log_time = time.time()
 
 
 def initiate_logging(path=None):
@@ -25,7 +25,7 @@ def initiate_logging(path=None):
 
     handler = logging.FileHandler(filename=path)
     handler.setFormatter(JsonFormatter(
-        "%(asctime)s %(levelname)s"
+        '%(asctime)s %(levelname)s'
     ))
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
@@ -35,11 +35,11 @@ def initiate_logging(path=None):
 
 
 def log_info():
-    global start_time
+    global log_time
     current_time = time.time()
-    if (current_time - start_time) >= LOG_INTERVALS_SECONDS:
+    if (current_time - log_time) >= LOG_INTERVALS_SECONDS:
         logger.info(collector.get_all_data())
-        start_time = current_time
+        log_time = current_time
 
 
 def thread_function():
@@ -48,19 +48,19 @@ def thread_function():
 
 
 def log_warning(message, data=None):
-    message = {"message": message}
+    message = {'message': message}
     if data is None:
         logger.warning(message)
     else:
-        logger.warning(message, extra={"extra": data})
+        logger.warning(message, extra={'data': data})
 
 
 def log_error(message, data=None):
-    message = {"message": message}
+    message = {'message': message}
     if data is None:
         logger.error(message)
     else:
-        logger.error(message, extra={"extra": data})
+        logger.error(message, extra={'data': data})
 
 
 def flush():
