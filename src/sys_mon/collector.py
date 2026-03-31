@@ -13,8 +13,9 @@ All run on separate threads.
 MEMORY_STATS_END_INDEX = 4
 ROUND_UP_TO_DIGITS = 2
 NETWORK_SPEED_INTERVAL = 5
+INCLUDE_ALL_PARTITIONS = True
 
-cpu_update_interval = 0
+cpu_update_interval = 2
 cpu_data = {
     'average': 0.0,
     'cores': [],
@@ -56,20 +57,20 @@ def update_ram_data():
 
 def update_partitions_data():
     """ For each partition, updates path and statistics """
-    partitions_stats = psutil.disk_partitions(all=True)  # if all=False returns physical devices only
+    partitions_stats = psutil.disk_partitions(all=INCLUDE_ALL_PARTITIONS)
     for partition in partitions_stats:
         path = partition.mountpoint
         disk_stats = get_disk_stats(path)
         if not disk_stats:
-            partitions_data.pop(path, None)  # returns None in case path isn't in the data
+            partitions_data.pop(path, None)  # None in case path isn't in the data
         else:
             partitions_data[path] = get_disk_stats(path)
 
 
 def get_disk_stats(path):
-    """ Given a partition, returns its total, used, available memory, and used memory percentage """
+    """ Given a partition, returns its total, used, available, percentage of memory """
     if not os.path.exists(path):
-        logger.log_warning("Path doesn't exist", path)
+        logger.log_warning("Partition doesn't exist", path)
         return None
 
     try:
@@ -90,7 +91,7 @@ def get_disk_stats(path):
 
 
 def update_network_data():
-    """ Updates delta bytes / delta seconds for upload and download speed, across all the interfaces combined """
+    """ Updates upload and download speed (delta bytes / delta seconds) across all interfaces combined """
     start_time = time.time()
     counter = psutil.net_io_counters(pernic=True)
     start_upload_bytes = sum(s.bytes_sent for s in counter.values())
@@ -118,8 +119,8 @@ def convert_to_human_format(stats):
 
 def initiate_collector(cpu_interval):
     global cpu_update_interval
-
-    cpu_update_interval = cpu_interval
+    if cpu_interval:
+        cpu_update_interval = cpu_interval
 
     cpu_thread = threading.Thread(target=cpu_thread_function, daemon=True)
     cpu_thread.start()

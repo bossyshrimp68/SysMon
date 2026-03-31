@@ -63,6 +63,7 @@ def test_update_network_data(mocker):
         end_counter[i] = SimpleNamespace(bytes_sent=5000 + i, bytes_recv=5000 + i)
     mocker.patch('sys_mon.collector.psutil.net_io_counters', side_effect=[start_counter, end_counter])
     mocker.patch('sys_mon.collector.time.time', side_effect=[start_time, end_time])
+    mocker.patch('sys_mon.collector.time.sleep')
 
     collector.update_network_data()
     network_data = collector.get_network_data()
@@ -102,8 +103,7 @@ def test_get_disk_stats_invalid_path(mocker):
     invalid_path = collector.get_disk_stats('invalid_path')  # if path doesn't exist
 
     mocker.patch('sys_mon.collector.os.path.exists', return_value=True)
-
-    disconnected_path = collector.get_disk_stats('path')  # path is invalid and os is patched -> as if disconnection
+    disconnected_path = collector.get_disk_stats('path')  # if disconnection
 
     assert invalid_path is None
     assert disconnected_path is None

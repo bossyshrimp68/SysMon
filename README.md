@@ -8,7 +8,7 @@ My first python project!
 
 ---
 
-![img](sys-mon-recording.gif)
+![img](docs/sys-mon-recording.gif)
 
 ---
 
@@ -17,7 +17,7 @@ My first python project!
 - **Live dashboard** - continuously updating dashboard with color coded panels that turn red when thresholds are breached
 - **Data tracking** - CPU tracking for each core alone and combined, RAM and partition tracking for total, used, 
 available, percentage of memory, plus upload and download network speed.
-- **Threshold alerts** - desktop notifications every 25 seconds if CPU or RAM percentage exceed your desired threshold.
+- **Threshold alerts** - desktop notifications if a threshold is breached.
 - **Logging** - appends timestamped readings to a file as JSON lines, logs errors and warnings as well.
 - **Daily reports** - presents a min/avg/max analysis of every metric for a given log file and date.
 

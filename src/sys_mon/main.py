@@ -5,11 +5,9 @@ import sys
 from sys_mon import collector, display, logger, report, threshold_monitor
 
 """
-Excepts the flags from the parser, unites the logger, collector and display.
-This class initiates all the threads and calls the display.
+Accepts the flags from the parser, unites the logger, collector, display, monitor and report.
+This class initiates all the threads and calls the correct display (dashboard or report).
 """
-
-DEFAULT_INTERVAL_VALUE = 2
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--interval', required=False, type=int, help='Interval for cpu calculations, default is 2 seconds')
@@ -47,8 +45,7 @@ def get_interval():
     interval = args.interval
     if interval:
         return interval
-    else:
-        return DEFAULT_INTERVAL_VALUE
+    return None
 
 
 def get_log_path():

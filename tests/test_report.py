@@ -39,6 +39,12 @@ DATA_BY_DATE = [
         'network': {'upload': '191.7 Bps', 'download': '234.11 Bps'}
     },
     {
+        'asctime': '2026-03-26 15:31:07,200',
+        'extra': '9%',
+        'levelname': 'WARNING',
+        'message': 'cpu breached threshold',
+    },
+    {
         'asctime': '2026-03-26 15:31:12,208', 'levelname': 'INFO',
         'cpu': {'average': 12.47, 'cores': [79.4, 42.3, 41.2, 34.8]},
         'ram': {'total': '15.6G', 'used': '13.7G', 'available': '1.9G', 'percent': 87.9},

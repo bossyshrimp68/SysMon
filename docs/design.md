@@ -38,22 +38,20 @@ get a copy of each variable, so data is always available for display, logging or
 
 ### `display`
 Responsible for a continuously updating dashboard, presenting the data from collector. using `rich` it creates a display
-split to different layouts - one for each metric and a footer.
+split to different layouts - one for each metric and a footer. It also has a function for displaying the report, reading 
+from the report module. both are called by main, according to the user input.
+
 Because collector always holds the latest value, display always has data to show, and doesn't concern itself with
 collector's state.
 
 before updating the CPU and RAM panels, it checks with the threshold_monitor module if the thresholds have been breached,
 and if so it turns the corresponding panel red.
 
-It contains two main functions, that are called in main according to parsed command:
-- **dashboard()** - for the dashboard, updates the panels live.
-- **report()** - gets the report from report module, and presents it.
-
 ### `logger`
-Responsible for logging data, warnings and errors in one-line JSON readings. It runs on its own thread in the background, 
-that logs all the metrics from collector every logging interval with time stamps. 
+Responsible for logging data, warnings and errors in one-line JSON readings. It runs on its own thread, that logs all 
+the metrics from collector every logging interval with time stamps. 
 
-It also provides functions for logging errors and warning - that log a message and an optional extra data. This is used
+It also provides functions for logging errors and warning - they log a message and optional extra data. This is used
 in collector for disk errors, and in threshold_monitoring for threshold breaches. 
 
 If the user doesn't want to log - a null handler is passed into the logger, so the logging of errors and warnings in
@@ -72,19 +70,19 @@ Each JSON line is formatted as such:
 ```
 
 ### `threshold_monitor`
-Responsible for monitoring and handling threshold breached. it runs on its own thread in the background, and gets the
-thresholds from main when initiated.
+Responsible for monitoring and handling threshold breached. It runs on its own thread, and gets the thresholds from main
+when initiated.
 
-It Provides functions for checking whether CPU or RAM threshold were exceeded, that way display doesn't need to have any
+It Provides functions for checking whether CPU or RAM threshold were breached, that way display doesn't need to have any
 collector logic, and collector doesn't need to concern itself with user input.
 
 If a threshold has been breached - it alerts it every 25 seconds using `plyer`, and logs it as a warning with a message 
 and the threshold as the extra data. 
 
 ### `report`
-Responsible for generating a daily report given a log file and a date. It is independent of collector.
-It reads a log file with JSON lines only - this way it is easier to parse the data instead of a whole JSON file.
-the data flow:
+Responsible for generating a daily report given a log file and a date. It is independent of collector. It reads a log 
+file with JSON lines only.
+The data flow:
 ```
 filters the relevant data by date
             |

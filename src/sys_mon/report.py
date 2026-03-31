@@ -1,4 +1,5 @@
 import json
+from json.decoder import JSONDecodeError
 import sys
 
 """
@@ -33,7 +34,7 @@ def generate_report(date: str, log_path: str):
 
 
 def get_data_by_date(date: str, log_path: str):
-    """ Gets a file with json lines. returns the lines that match the given date """
+    """ Gets a file with json lines, returns the lines that match the given date """
     content_in_date = []
     with open(log_path, 'r') as log_file:
         for line in log_file:
@@ -45,8 +46,7 @@ def get_data_by_date(date: str, log_path: str):
                 if log_date > date:
                     break
 
-            except Exception as e:
-                print(line)
+            except JSONDecodeError:
                 print('Not a valid file. must contain only json lines')
                 sys.exit(-1)
 
@@ -68,6 +68,7 @@ def split_data(data_list):
         if data['levelname'] == 'INFO':
             cpu_usages.append(data['cpu']['average'])
             ram_usages.append(data['ram']['percent'])
+
             if data['network']['upload']:  # initially they are both ''
                 network_speed['upload'].append(data['network']['upload'])
                 network_speed['download'].append(data['network']['download'])

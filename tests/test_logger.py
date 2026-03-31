@@ -24,7 +24,7 @@ def read_json_line(file_path):
 def test_log_info(mocker):
     file_path = initiate_test_logging(mocker)
 
-    mocker.patch('sys_mon.logger.start_time', FAKE_LOGGING_TIME)
+    mocker.patch('sys_mon.logger.log_time', FAKE_LOGGING_TIME)
     mocker.patch('sys_mon.collector.get_all_data', return_value={'data': 'info'})
 
     logger.log_info()
