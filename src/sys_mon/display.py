@@ -28,20 +28,20 @@ DEFAULT_BOX_TYPE = box.DOUBLE_EDGE
 def create_layout():
     layout = Layout(name='sysmon')
     layout.split_row(
-        Layout(name='panels'),
-        Layout(name='cpu', size=75),
+        Layout(name='panels', ratio=3),
+        Layout(name='cpu', ratio=2),
     )
     layout['panels'].split(
-        Layout(name='upper', ratio=1),
-        Layout(name='lower', size=26)
+        Layout(name='upper', ratio=2),
+        Layout(name='lower', ratio=2)
     )
     layout['upper'].split_row(
-        Layout(name='network'),
-        Layout(name='ram', size=65)
+        Layout(name='network', ratio=1),
+        Layout(name='ram', ratio=2)
     )
     layout['lower'].split(
-        Layout(name='partitions'),
-        Layout(name='footer', size=5),
+        Layout(name='partitions', ratio=3),
+        Layout(name='footer', ratio=1),
     )
     return layout
 
@@ -53,8 +53,7 @@ def generate_footer():
         Align.left(footer_message),
         box=DEFAULT_BOX_TYPE,
         border_style=FOOTER_COLOR,
-        width=100,
-        padding=(1, 2)
+        padding=(1, 1)
     )
 
 
@@ -65,9 +64,9 @@ def generate_cpu_panel():
     cpu_table = Table(show_edge=False, border_style=color, expand=True, leading=1)
 
     average_cpu_bar = ProgressBar(completed=cpu_data['average'], complete_style=DEFAULT_COLOR)
-    cpu_table.add_column('Average', width=7)  # core
-    cpu_table.add_column(average_cpu_bar, width=25)  # bar
-    cpu_table.add_column(f'{cpu_data["average"]}%', width=7)  # percentage
+    cpu_table.add_column('Average')  # core
+    cpu_table.add_column(average_cpu_bar)  # bar
+    cpu_table.add_column(f'{cpu_data["average"]}%')  # percentage
 
     for i, percent in enumerate(cpu_data['cores']):
         cpu_table.add_row(
@@ -78,7 +77,7 @@ def generate_cpu_panel():
 
     return Panel(
         Align.center(cpu_table),
-        padding=(2, 0),
+        padding=(2, 2),
         title='CPU',
         box=DEFAULT_BOX_TYPE,
         border_style=color
@@ -93,7 +92,6 @@ def generate_ram_panel():
         show_edge=False,
         show_header=False,
         border_style=color,
-        width=30,
         padding=(1, 1),
         expand=True
     )
@@ -108,7 +106,6 @@ def generate_ram_panel():
         completed=ram_data['percent'],
         complete_style=DEFAULT_COLOR,
         finished_style=WARNING_COLOR,
-        width=50,
     )
 
     return Panel(
@@ -122,8 +119,6 @@ def generate_ram_panel():
         title='RAM',
         box=DEFAULT_BOX_TYPE,
         border_style=color,
-        width=61,
-        height=20
     )
 
 
@@ -134,7 +129,6 @@ def generate_network_panel():
         show_edge=False,
         show_header=False,
         border_style=NETWORK_COLOR,
-        width=30,
         padding=(1, 1),
         expand=True,
     )
@@ -158,8 +152,6 @@ def generate_network_panel():
         title='Network',
         box=DEFAULT_BOX_TYPE,
         border_style=NETWORK_COLOR,
-        width=35,
-        height=20
     )
 
 
@@ -188,8 +180,6 @@ def generate_partitions_panel():
         title='Partitions',
         box=DEFAULT_BOX_TYPE,
         border_style=PARTITIONS_COLOR,
-        width=100,
-        height=20
     )
 
 
