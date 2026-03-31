@@ -1,8 +1,10 @@
 # SysMon
-> A CLI tool for monitoring system performance in real time.
+> A CLI tool for monitoring system performance live.
 
-SysMon tracks CPU, memory, disk and network metrics from your terminal, and presents the data on a live dashboard with
-threshold, alerts, logging and daily reports.
+SysMon tracks CPU, RAM, partitions and network metrics from your terminal, and presents the data on a live dashboard with
+threshold alerts, logging and daily reports.
+
+My first python project!
 
 ---
 
@@ -12,12 +14,11 @@ threshold, alerts, logging and daily reports.
 
 ## Features
 
-- **Live dashboard** - continuously updating terminal display with color coded panels that turn red when thresholds 
-are breached
-- **Data tracking** - cpu tracking for each core alone and combined, memory and disk tracking (of every partition)
-for total, used, available, percentage memory, plus upload and download network speed.
+- **Live dashboard** - continuously updating dashboard with color coded panels that turn red when thresholds are breached
+- **Data tracking** - CPU tracking for each core alone and combined, RAM and partition tracking for total, used, 
+available, percentage of memory, plus upload and download network speed.
 - **Threshold alerts** - desktop notifications every 25 seconds if CPU or RAM percentage exceed your desired threshold.
-- **Logging** - appends timestamped readings to a file as json lines, logs errors and warnings as well.
+- **Logging** - appends timestamped readings to a file as JSON lines, logs errors and warnings as well.
 - **Daily reports** - presents a min/avg/max analysis of every metric for a given log file and date.
 
 ---
@@ -69,15 +70,15 @@ Generate a min/avg/max analysis for a specific date in a log file:
 sys-mon report --rlog log/file/path.txt --date 2026-3-30
 ```
 
-- --rlog - path of the log file from witch to generate the report.
+- --rlog - path of the log file from which to generate the report.
 - --date - the date to report on, must be in the format y-m-d.
 
 ## All flags
-| Flag         | Description                    | Default |
-|--------------|--------------------------------|---------|
-| `--log`      | Path to write the log file     | None    |
-| `--interval` | CPU update interval in seconds | 2       |
-| `--cpu-warn` | CPU usage threshold (0–100)    | 100     |
-| `--mem-warn` | RAM usage threshold (0–100)    | 100     |
-| `--rlog`     | Log path for the report        | None    |
-| `--date`     | Date to report on in the rlog  | None    |
+| Flag         | Description                            | Default              |
+|--------------|----------------------------------------|----------------------|
+| `--log`      | Path for the log file writing          | None                 |
+| `--interval` | CPU update interval in seconds         | 2                    |
+| `--cpu-warn` | CPU usage percentage threshold (0–100) | 100 (never breached) |
+| `--mem-warn` | RAM usage percentage threshold (0–100) | 100 (never breached) |
+| `--rlog`     | Log path for the file to report on     | None                 |
+| `--date`     | Date to report on in the rlog file     | None                 |

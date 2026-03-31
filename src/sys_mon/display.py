@@ -221,7 +221,7 @@ def report_display(report_data: dict):
     console.print(report_panel)
 
 
-def display():
+def dashboard():
     layout = create_layout()
     layout['cpu'].update(generate_cpu_panel())
     layout['ram'].update(generate_ram_panel())

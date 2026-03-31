@@ -84,7 +84,7 @@ def main():
             collector.initiate_collector(get_interval())
             logger.initiate_logging(get_log_path())
             threshold_monitor.initiate_monitor(get_thresholds())
-            display.display()
+            display.dashboard()
 
     except KeyboardInterrupt:
         print('Closing...')
