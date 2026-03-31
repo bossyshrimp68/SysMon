@@ -12,6 +12,7 @@ dependencies = [
     "rich",
     "psutil",
     "plyer",
+    "pythonjsonlogger"
 ]
 author = [
     { name = "Romy Pine", email = "romypine007@gmail.com" },

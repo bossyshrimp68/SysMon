@@ -28,7 +28,7 @@ available, percentage of memory, plus upload and download network speed.
 ```bash
 git clone https://github.com/bossyshrimp68/SysMon.git
 cd SysMon
-pip install sys-mon
+pip install .
 ```
 
 ---
